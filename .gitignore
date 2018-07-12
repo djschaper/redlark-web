@@ -1,6 +1,6 @@
-## Project ignore
 .env
 build
 node_modules
 *.dll
 .vs
+meh

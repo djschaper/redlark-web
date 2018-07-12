@@ -1,61 +1,77 @@
 const port = process.env.PORT || 3000
 const http = require('http')
+const url = require('url')
 const fs = require('fs')
-const verifyUser = require('./login').verifyUser
+const glob = require('glob')
+
 const sequelize = require('./sequelize')
 
-const loginHTML = fs.readFileSync('./login.html')
-const mainHTML = fs.readFileSync('./index.html')
-
-const log = function(entry) {
-    fs.appendFileSync('/tmp/sample-app.log', new Date().toISOString() + ' - ' + entry + '\n')
+const registeredRoutes = []
+const registerAllRoutes = () => {
+    const registerRoute = (route) => registeredRoutes.push(route)
+    const routeFiles = glob.sync('./routes/**/*.js')
+    routeFiles.forEach(file => registerRoute(require(file).route))
 }
 
-const server = http.createServer(function (req, res) {
-    if (req.method === 'POST') {
-        let body = ''
-
-        req.on('data', function(chunk) {
-            body += chunk
-        })
-
-        req.on('end', function () {
-            switch (req.url) {
-                case '/scheduled':
-                    log('Received task ' + req.headers['x-aws-sqsd-taskname'] + ' scheduled at ' + req.headers['x-aws-sqsd-scheduled-at'])
-                    break
-                case '/login':
-                    return verifyUser(body)
-                        .then((success) => {
-                            if (success) {
-                                console.log('Successful login')
-                                res.writeHead(200)
-                                res.write(mainHTML)
-                                res.end()
-                            } else {
-                                console.log('Unsuccessful login')
-                                res.writeHead(400)
-                                res.write('<body><p>Failed to login</p></body>')
-                                res.end()
-                            }
-                        })
-                    break
-                default:
-                    log('Received message: ' + body)
-                    break
-            }
-
-            res.writeHead(200, 'OK', {'Content-Type': 'text/plain'})
-            res.end()
-        })
-    } else {
-        res.writeHead(200)
-        res.write(loginHTML)
-        res.end()
+const parseJSON = (str) => {
+    try {
+        return JSON.parse(request.body)
+    } catch (err) {
+        return {}
     }
+}
+
+const parseFormURLEncoded = (str) => {
+    const elements = str.split('&');
+    return elements.reduce((acc, val) => {
+        const [key, value] = val.split('=')
+        acc[key] = decodeURIComponent(value)
+        return acc
+    }, {})
+}
+
+const server = http.createServer((request, reply) => {
+    const details = url.parse(request.url, true)
+    request.path = details.pathname
+    request.query = details.query
+    
+    request.body = ''
+    request.on('data', (chunk) => {
+        request.body += chunk
+    })
+
+    request.on('end', () => {
+        // Log request details
+        console.log(`Request: ${request.method} ${request.url}`)
+        console.log(`Headers: ${JSON.stringify(request.headers, null, 2)}`)
+
+        // Try find route
+        const matchedRoutes = registeredRoutes.filter(route =>
+            route.path === request.path &&
+            route.method === request.method
+        )
+
+        // Route does not exist
+        if (matchedRoutes.length !== 1) {
+            console.log('Route not found.')
+            reply.writeHead(404)
+            reply.write('<body>Route not found. Thanks for coming out.</body>')
+            return reply.end()
+        }
+
+        // Pre-process request data
+        if (request.headers['content-type'] === 'application/json') {
+            request.body = parseJSON(request.body)
+        } else if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
+            request.body = parseFormURLEncoded(request.body)
+        }
+
+        // Route request to handler
+        matchedRoutes[0].handler(request, reply)
+    })
 })
 
-const main = () => {
+const startServer = () => {
     sequelize.init()
 
     // Listen on port 3000, IP defaults to 127.0.0.1
@@ -63,6 +79,8 @@ const main = () => {
 
     // Put a friendly message on the terminal
     console.log('Server running at http://127.0.0.1:' + port + '/')
+
+    registerAllRoutes()
 }
 
-main()
+startServer()

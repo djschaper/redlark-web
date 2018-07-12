@@ -6,11 +6,13 @@
     "build": "node -e \"require('./bin/deploy.js').build()\"",
     "build:deploy": "node -e \"require('./bin/deploy.js').buildAndDeploy()\"",
     "deploy": "node -e \"require('./bin/deploy.js').deploy()\"",
+    "meh": "nodemon meh.js",
     "start": "cd src && node app.js",
     "start:dev": "cd src && nodemon --require dotenv/config app.js -e js,mjs,json,html dotenv_config_path=../.env",
     "sync:db": "cd bin && node ./dbSync.js"
   },
   "dependencies": {
+    "glob": "^7.1.2",
     "mysql2": "^1.5.3",
     "password-hash": "^1.2.2",
     "sequelize": "^4.38.0"
@@ -20,7 +22,10 @@
     "aws-sdk": "^2.270.1",
     "bluebird": "^3.5.1",
     "dotenv": "^6.0.0",
+    "dropbox": "^4.0.7",
     "fs-extra": "^6.0.1",
+    "googleapis": "^27.0.0",
+    "isomorphic-fetch": "^2.2.1",
     "nodemon": "^1.17.5",
     "prompt-promise": "^1.0.3"
   }
