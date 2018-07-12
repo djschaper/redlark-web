@@ -1,12 +1,12 @@
 {
   "name": "FBC-Redlark",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
     "build:deploy": "node -e \"require('./bin/deploy.js').buildAndDeploy()\"",
     "deploy": "node -e \"require('./bin/deploy.js').deploy()\"",
-    "meh": "nodemon meh.js",
+    "meh": "cd meh && nodemon meh.js",
     "start": "cd src && node app.js",
     "start:dev": "cd src && nodemon --require dotenv/config app.js -e js,mjs,json,html dotenv_config_path=../.env",
     "sync:db": "cd bin && node ./dbSync.js"
