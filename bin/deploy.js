@@ -55,7 +55,7 @@ const monitorStatus = (pause = 0, greenCount = 0) => sleep(pause)
         if (status.Color === 'Red') {
             console.log('Something is wrong. Check application.')
         } else if (status.Color === 'Green') {
-            if (++greenCount < 3) return monitorStatus(3000, greenCount)
+            if (++greenCount < 5) return monitorStatus(3000, greenCount)
 
             console.log('Application is running smoothly!')
         }
