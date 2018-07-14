@@ -1,6 +1,6 @@
 {
   "name": "FBC-Redlark",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
@@ -14,9 +14,10 @@
     "migration:create": "sequelize migration:create --name",
     "seed:create": "sequelize seed:create --name",
     "start": "sequelize db:migrate && sequelize db:seed:all && cd src && node app.js",
-    "start:dev": "cd src && nodemon --require dotenv/config app.js -e js,mjs,json,html dotenv_config_path=../.env"
+    "start:dev": "cd src && nodemon app.js -e js,mjs,json,html"
   },
   "dependencies": {
+    "dotenv": "^6.0.0",
     "glob": "^7.1.2",
     "mysql2": "^1.5.3",
     "password-hash": "^1.2.2",
@@ -27,7 +28,6 @@
     "archiver-promise": "^1.0.0",
     "aws-sdk": "^2.270.1",
     "bluebird": "^3.5.1",
-    "dotenv": "^6.0.0",
     "dropbox": "^4.0.7",
     "fs-extra": "^6.0.1",
     "isomorphic-fetch": "^2.2.1",

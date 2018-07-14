@@ -37,23 +37,29 @@ const build = () => {
         })
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => {
+    if (resolve < 10) resolve()
+    setTimeout(resolve, ms)
+})
 
-const monitorStatus = () => EBS.describeEnvironmentHealth({
-    EnvironmentName: APPLICATION_ENV,
-    AttributeNames: ['HealthStatus', 'Color', 'Status']
-}).promise()
+const monitorStatus = (pause = 0, greenCount = 0) => sleep(pause)
+    .then(() => EBS.describeEnvironmentHealth({
+        EnvironmentName: APPLICATION_ENV,
+        AttributeNames: ['HealthStatus', 'Color', 'Status']
+    }).promise())
     .then((status) => {
         console.log(`Application status: ${status.Status} - ${status.HealthStatus} (${status.Color})`)
-        if (status.Status === 'Updating') {
-            return sleep(3000)
-                .then(() => monitorStatus())
-        }
+
+        if (status.Status === 'Updating') return monitorStatus(3000)
+
         if (status.Color === 'Red') {
             console.log('Something is wrong. Check application.')
         } else if (status.Color === 'Green') {
+            if (++greenCount < 3) return monitorStatus(3000, greenCount)
+
             console.log('Application is running smoothly!')
         }
+
         return Promise.resolve()
     })
 
