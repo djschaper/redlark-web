@@ -5,17 +5,24 @@
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
     "build:deploy": "node -e \"require('./bin/deploy.js').buildAndDeploy()\"",
+    "db:migrate": "sequelize db:migrate",
+    "db:migrate:undo": "sequelize db:migrate:undo",
+    "db:seed": "sequelize db:seed:all",
+    "db:seed:undo": "sequelize db:seed:undo --seed",
     "deploy": "node -e \"require('./bin/deploy.js').deploy()\"",
     "meh": "cd meh && nodemon meh.js",
-    "start": "cd src && node app.js",
-    "start:dev": "cd src && nodemon --require dotenv/config app.js -e js,mjs,json,html dotenv_config_path=../.env",
-    "sync:db": "cd bin && node ./dbSync.js"
+    "migration:create": "sequelize migration:create --name",
+    "seed:create": "sequelize seed:create --name",
+    "start": "npm run db:migrate && npm run db:seed && cd src && node app.js",
+    "start:dev": "cd src && nodemon --require dotenv/config app.js -e js,mjs,json,html dotenv_config_path=../.env"
   },
   "dependencies": {
     "glob": "^7.1.2",
+    "googleapis": "^32.0.0",
     "mysql2": "^1.5.3",
     "password-hash": "^1.2.2",
-    "sequelize": "^4.38.0"
+    "sequelize": "^4.38.0",
+    "sequelize-cli": "^4.0.0"
   },
   "devDependencies": {
     "archiver-promise": "^1.0.0",
@@ -24,7 +31,6 @@
     "dotenv": "^6.0.0",
     "dropbox": "^4.0.7",
     "fs-extra": "^6.0.1",
-    "googleapis": "^27.0.0",
     "isomorphic-fetch": "^2.2.1",
     "nodemon": "^1.17.5",
     "prompt-promise": "^1.0.3"

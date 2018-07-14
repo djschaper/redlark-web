@@ -4,7 +4,7 @@ const url = require('url')
 const fs = require('fs')
 const glob = require('glob')
 
-const sequelize = require('./sequelize')
+console.info = (message) => console.log('[INFO] ' + message)
 
 const registeredRoutes = []
 const registerAllRoutes = () => {
@@ -42,8 +42,8 @@ const server = http.createServer((request, reply) => {
 
     request.on('end', () => {
         // Log request details
-        console.log(`Request: ${request.method} ${request.url}`)
-        console.log(`Headers: ${JSON.stringify(request.headers, null, 2)}`)
+        console.info(`Request: ${request.method} ${request.url}`)
+        console.info(`Headers: ${JSON.stringify(request.headers, null, 2)}`)
 
         // Try find route
         const matchedRoutes = registeredRoutes.filter(route =>
@@ -72,8 +72,6 @@ const server = http.createServer((request, reply) => {
 })
 
 const startServer = () => {
-    sequelize.init()
-
     // Listen on port 3000, IP defaults to 127.0.0.1
     server.listen(port)
 

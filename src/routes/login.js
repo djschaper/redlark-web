@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const sequelize = require('../sequelize')
+const db = require('../sequelize/models')
 
 const mainHTML = fs.readFileSync(path.resolve(__dirname, '../pages/index.html'))
 
@@ -27,8 +27,7 @@ const handler = (request, reply) => {
         return respondFailure(reply)
     }
 
-    const User = sequelize.getModel('user')
-    return User.findOne({ where: { email } })
+    return db.User.findOne({ where: { email } })
         .then((user) => {
             if (!user) return false
 

@@ -1,5 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('user', {
+    const User = sequelize.define('User', {
+        id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true
+        },
         firstName: {
             field: 'first_name',
             type: DataTypes.STRING,
@@ -19,8 +25,16 @@ module.exports = (sequelize, DataTypes) => {
             field: 'password_hash',
             type: DataTypes.STRING,
             allowNull: false
+        },
+        phoneNumber: {
+            field: 'phone_number',
+            type: DataTypes.STRING
         }
-    }, { underscored: true })
+    })
+
+    User.associate = (models) => {
+        User.hasMany(models.UserSession)
+    }
 
     return User
 }

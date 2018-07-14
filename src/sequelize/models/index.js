@@ -1,26 +1,30 @@
-const fs = require('fs');
-const path = require('path');
-const basename = path.basename(__filename);
-const db = {};
+const fs = require('fs')
+const path = require('path')
+const Sequelize = require('sequelize')
+const basename = path.basename(__filename)
+const env = process.env.NODE_ENV || 'development'
+const config = require(path.resolve(__dirname, '../../../db/config.js'))
+const db = {}
 
-const setupModels = (sequelize) => {
-    fs.readdirSync(__dirname)
-        .filter(file => {
-            return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js')
-        })
-        .forEach(file => {
-            var model = sequelize.import(path.join(__dirname, file))
-            db[model.name] = model
-        })
+console.log('Initializing database connection')
+const sequelize = new Sequelize(config.database, config.username, config.password, config)
 
-    Object.keys(db).forEach(modelName => {
-        if (db[modelName].associate) {
-            db[modelName].associate(db)
-        }
+fs.readdirSync(__dirname)
+    .filter(file => {
+        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js')
     })
-}
+    .forEach(file => {
+        const model = sequelize.import(path.join(__dirname, file))
+        db[model.name] = model
+    })
 
-module.exports = {
-    setupModels,
-    db
-}
+Object.keys(db).forEach(modelName => {
+    if (db[modelName].associate) {
+        db[modelName].associate(db)
+    }
+})
+
+db.sequelize = sequelize
+db.Sequelize = Sequelize
+
+module.exports = db
