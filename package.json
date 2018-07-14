@@ -1,6 +1,6 @@
 {
   "name": "FBC-Redlark",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "private": true,
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
@@ -13,12 +13,11 @@
     "meh": "cd meh && nodemon meh.js",
     "migration:create": "sequelize migration:create --name",
     "seed:create": "sequelize seed:create --name",
-    "start": "npm run db:migrate && npm run db:seed && cd src && node app.js",
+    "start": "sequelize db:migrate && sequelize db:seed:all && cd src && node app.js",
     "start:dev": "cd src && nodemon --require dotenv/config app.js -e js,mjs,json,html dotenv_config_path=../.env"
   },
   "dependencies": {
     "glob": "^7.1.2",
-    "googleapis": "^32.0.0",
     "mysql2": "^1.5.3",
     "password-hash": "^1.2.2",
     "sequelize": "^4.38.0",
