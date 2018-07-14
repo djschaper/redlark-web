@@ -33,5 +33,12 @@
     "isomorphic-fetch": "^2.2.1",
     "nodemon": "^1.17.5",
     "prompt-promise": "^1.0.3"
-  }
+  },
+  "beanstalkPackage": [
+    "src/",
+    "db/",
+    "package.json",
+    ".ebextensions",
+    ".sequelizerc"
+  ]
 }

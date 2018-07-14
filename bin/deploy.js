@@ -4,15 +4,11 @@ const fs = require('fs-extra')
 const prompt = require('prompt-promise')
 const exec = require('child_process').execSync
 
-const { version } = require('../package.json')
+const { version, beanstalkPackage } = require('../package.json')
 
-const PACKAGE = [
-    'src',
-    'package.json',
-    '.ebextensions'
-]
 const S3_BUCKET = 'schaper'
 const APPLICATION_NAME = 'fbc-worship'
+const APPLICATION_ENV = 'FbcWorship-env'
 const VERSION_REGEX = /^\d+\.\d+\.\d+$/
 const BUILD_DIR = 'build'
 
@@ -29,7 +25,7 @@ const syncToBuild = (fsObj) => new Promise((resolve, reject) => resolve(fs.copy(
 const build = () => {
     console.log('Creating build package...')
     return fs.emptyDir(BUILD_DIR)
-        .then(() => Promise.all(PACKAGE.map(part => syncToBuild(part))))
+        .then(() => Promise.all(beanstalkPackage.map(part => syncToBuild(part))))
         .then(() => {
             console.log('Installing production node_modules...')
             exec(`cd ${BUILD_DIR} && npm install --only=production && cd ../`, { stdio: [0, 1, 2] })
@@ -40,6 +36,26 @@ const build = () => {
             process.exit(0)
         })
 }
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const monitorStatus = () => EBS.describeEnvironmentHealth({
+    EnvironmentName: APPLICATION_ENV,
+    AttributeNames: ['HealthStatus', 'Color', 'Status']
+}).promise()
+    .then((status) => {
+        console.log(`Application status: ${status.Status} - ${status.HealthStatus} (${status.Color})`)
+        if (status.Status === 'Updating') {
+            return sleep(3000)
+                .then(() => monitorStatus())
+        }
+        if (status.Color === 'Red') {
+            console.log('Something is wrong. Check application.')
+        } else if (status.Color === 'Green') {
+            console.log('Application is running smoothly!')
+        }
+        return Promise.resolve()
+    })
 
 const deploy = () => {
     const versionLabel = `Redlark ${version}`
@@ -85,11 +101,14 @@ const deploy = () => {
             }).promise()
         })
         .then(() => EBS.updateEnvironment({
-            EnvironmentName: 'FbcWorship-env',
+            EnvironmentName: APPLICATION_ENV,
             VersionLabel: versionLabel
         }).promise())
         .then(() => {
             console.log('Deployment complete!')
+            return monitorStatus()
+        })
+        .then(() => {
             process.exit(0)
         })
         .catch((err) => {
@@ -104,5 +123,6 @@ const buildAndDeploy = () => build().then(() => deploy())
 module.exports = {
     build,
     deploy,
+    monitorStatus,
     buildAndDeploy
 }
