@@ -1,17 +1,11 @@
 ﻿const passwordHash = require('password-hash')
 const fs = require('fs')
 const path = require('path')
+const uuid = require('uuid')
 
 const db = require('../sequelize/models')
-
-const mainHTML = fs.readFileSync(path.resolve(__dirname, '../pages/index.html'))
-
-const respondSuccess = (reply) => {
-    console.log('Successful login')
-    reply.writeHead(200)
-    reply.write(mainHTML)
-    reply.end()
-}
+const { AUTH_METHODS, generateSession } = require('../lib/auth')
+const { redirect } = require('../lib/server')
 
 const respondFailure = (reply) => {
     console.log('Unsuccessful login')
@@ -27,15 +21,18 @@ const handler = (request, reply) => {
         return respondFailure(reply)
     }
 
+    let verifiedUser
     return db.User.findOne({ where: { email } })
         .then((user) => {
             if (!user) return false
+            verifiedUser = user
 
             return passwordHash.verify(password, user.passwordHash)
         })
         .then((verified) => {
             if (verified) {
-                return respondSuccess(reply)
+                return generateSession(verifiedUser.id, reply)
+                    .then(() => redirect(request, reply, '/'))
             } else {
                 return respondFailure(reply)
             }
@@ -45,6 +42,7 @@ const handler = (request, reply) => {
 const route = {
     method: 'POST',
     path: '/login',
+    auth: [AUTH_METHODS.NONE],
     handler
 }
 

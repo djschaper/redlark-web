@@ -4,6 +4,8 @@ const url = require('url')
 const fs = require('fs')
 const glob = require('glob')
 
+const { authorizeRoute } = require('./lib/auth')
+
 console.info = (message) => console.log('[INFO] ' + message)
 
 const registeredRoutes = []
@@ -59,15 +61,29 @@ const server = http.createServer((request, reply) => {
             return reply.end()
         }
 
-        // Pre-process request data
-        if (request.headers['content-type'] === 'application/json') {
-            request.body = parseJSON(request.body)
-        } else if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
-            request.body = parseFormURLEncoded(request.body)
-        }
+        const route = matchedRoutes[0]
 
-        // Route request to handler
-        matchedRoutes[0].handler(request, reply)
+        // Check authentication
+        return authorizeRoute(request, route.auth)
+            .then((authorized) => {
+                // Respond with forbidden if auth failed
+                if (!authorized) {
+                    console.log('User forbidden.')
+                    reply.writeHead(403)
+                    reply.write('<body>You shall not pass</body>')
+                    return reply.end()
+                }
+
+                // Pre-process request data
+                if (request.headers['content-type'] === 'application/json') {
+                    request.body = parseJSON(request.body)
+                } else if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
+                    request.body = parseFormURLEncoded(request.body)
+                }
+
+                // Route request to handler
+                return route.handler(request, reply)
+            })
     })
 })
 

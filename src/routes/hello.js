@@ -1,3 +1,5 @@
+const { AUTH_METHODS } = require('../lib/auth')
+
 const handler = (request, reply) => {
     reply.writeHead(200)
     reply.write('<body>Hello!</body>')
@@ -7,6 +9,7 @@ const handler = (request, reply) => {
 const route = {
     method: 'GET',
     path: '/hello',
+    auth: [AUTH_METHODS.NONE],
     handler
 }
 
