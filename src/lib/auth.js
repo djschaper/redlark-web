@@ -1,8 +1,10 @@
 const uuid = require('uuid')
 
 const db = require('../sequelize/models')
+const server = require('./server')
 
 const SESSION_UUID_COOKIE_KEY = 'sessionUUID'
+const FAILED_LOGIN_COOKIE_KEY = 'failedLogin'
 
 const saveAuthResult = (request, type, authorized = false, userId = null) => {
     const authResult = {
@@ -17,15 +19,7 @@ const saveAuthResult = (request, type, authorized = false, userId = null) => {
 
 const authorizeNone = (request) => Promise.resolve(saveAuthResult(request, AUTH_TYPES.NONE, true))
 
-const tryGetSessionUUIDFromRequest = (request) => {
-    const cookieJar = request.headers['cookie']
-    if (!cookieJar) return null
-
-    if (!cookieJar.includes(SESSION_UUID_COOKIE_KEY)) return null
-
-    sessionCookie = cookieJar.split(';').find(cookie => cookie.includes(SESSION_UUID_COOKIE_KEY))
-    return sessionCookie.split('=')[1].trim()
-}
+const tryGetSessionUUIDFromRequest = (request) => server.getCookie(request, SESSION_UUID_COOKIE_KEY)
 
 const authorizeMember = (request) => {
     const sessionUUID = tryGetSessionUUIDFromRequest(request)
@@ -70,23 +64,29 @@ const AUTH_TYPES = {
     ADMIN: 'admin'
 }
 
-const generateSession = (userId, reply) => db.UserSession.create({
-    userId,
-    uuid: uuid.v4()
-}).then((session) => {
-    reply.setHeader('set-cookie', [`${SESSION_UUID_COOKIE_KEY}=${session.uuid}`])
+const generateSession = (userId, reply) =>
+    db.UserSession.create({
+        userId,
+        uuid: uuid.v4()
+    }).then((session) => {
+        server.setCookie(reply, SESSION_UUID_COOKIE_KEY, session.uuid)
     })
 
 const deleteSession = (request, reply) => {
     const sessionUUID = tryGetSessionUUIDFromRequest(request)
     return db.UserSession.destroy({ where: { uuid: sessionUUID } })
-        .then(() => reply.setHeader('set-cookie', [`${SESSION_UUID_COOKIE_KEY}=null`]))
+        .then(() => server.setCookie(reply, SESSION_UUID_COOKIE_KEY, null))
 }
+
+const setFailedLoginFlag = (reply, value) => server.setCookie(reply, FAILED_LOGIN_COOKIE_KEY, value)
+const getFailedLoginFlag = (request) => server.getCookie(request, FAILED_LOGIN_COOKIE_KEY)
 
 module.exports = {
     AUTH_METHODS,
     AUTH_TYPES,
     generateSession,
     deleteSession,
-    authorizeRoute
+    authorizeRoute,
+    setFailedLoginFlag,
+    getFailedLoginFlag
 }

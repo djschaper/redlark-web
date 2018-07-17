@@ -4,7 +4,7 @@ const path = require('path')
 const uuid = require('uuid')
 
 const db = require('../sequelize/models')
-const { AUTH_METHODS, generateSession } = require('../lib/auth')
+const { AUTH_METHODS, generateSession, setFailedLoginFlag } = require('../lib/auth')
 const { redirect } = require('../lib/server')
 
 const respondFailure = (reply) => {
@@ -31,10 +31,12 @@ const handler = (request, reply) => {
         })
         .then((verified) => {
             if (verified) {
+                setFailedLoginFlag(reply, false)
                 return generateSession(verifiedUser.id, reply)
-                    .then(() => redirect(request, reply, '/'))
+                    .then(() => redirect(request, reply, ''))
             } else {
-                return respondFailure(reply)
+                setFailedLoginFlag(reply, true)
+                return redirect(request, reply, '')
             }
         })
 }

@@ -1,6 +1,6 @@
 {
   "name": "FBC-Redlark",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": true,
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
@@ -17,6 +17,7 @@
     "start:dev": "cd src && nodemon app.js -e js,mjs,json,html"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "dotenv": "^6.0.0",
     "glob": "^7.1.2",
     "mysql2": "^1.5.3",
