@@ -1,6 +1,6 @@
 {
-  "name": "FBC-Redlark",
-  "version": "0.2.7",
+  "name": "fbc-redlark",
+  "version": "0.2.8",
   "private": true,
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
@@ -20,6 +20,7 @@
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^6.0.0",
     "glob": "^7.1.2",
+    "googleapis": "^32.0.0",
     "mysql2": "^1.5.3",
     "password-hash": "^1.2.2",
     "sequelize": "^4.38.0",

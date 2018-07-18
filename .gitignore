@@ -4,3 +4,4 @@ node_modules
 *.dll
 .vs
 meh
+credentials.json

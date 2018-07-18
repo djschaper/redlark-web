@@ -6,6 +6,11 @@ const glob = require('glob')
 
 const { authorizeRoute } = require('./lib/auth')
 
+const SERVING_FOLDERS = [
+    'styles',
+    'assets'
+]
+
 console.info = (message) => console.log('[INFO] ' + message)
 
 const registeredRoutes = []
@@ -53,8 +58,19 @@ const server = http.createServer((request, reply) => {
             route.method === request.method
         )
 
-        // Route does not exist
+        // Pre-registered route does not exist
         if (matchedRoutes.length !== 1) {
+
+            // See if the path is a servable file
+            const folder = request.path.split('/')[1]
+            if (SERVING_FOLDERS.includes(folder)) {
+                const relativeFilePath = '.' + request.path
+                const file = fs.readFileSync(relativeFilePath)
+                reply.write(file)
+                return reply.end()
+            }
+
+            // 404 - Not Found
             console.log('Route not found.')
             reply.writeHead(404)
             reply.write('<body>Route not found. Thanks for coming out.</body>')
@@ -66,6 +82,7 @@ const server = http.createServer((request, reply) => {
         // Check authentication
         return authorizeRoute(request, route.auth)
             .then((authorized) => {
+
                 // Respond with forbidden if auth failed
                 if (!authorized) {
                     console.log('User forbidden.')

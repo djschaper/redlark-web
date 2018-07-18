@@ -29,7 +29,6 @@ const authorizeMember = (request) => {
         .then((userSession) => {
             if (!userSession) return saveAuthResult(request, AUTH_TYPES.MEMBER)
 
-            console.log('successful auth!')
             return saveAuthResult(request, AUTH_TYPES.MEMBER, true, userSession.userId)
         })
 }
