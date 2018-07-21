@@ -78,12 +78,12 @@ const listFoldersInFolder = (folderId) => {
         .catch((err) => console.log('The API returned an error: ' + err))
 }
 
-const listFilesInFolder = (folderId) => {
+const listFilesInFolder = (folderId, extension='') => {
     const drive = google.drive({ version: 'v3', auth: oAuth2Client })
     return drive.files.list({
         pageSize: 1000,
-        fields: 'files(id, name)',
-        q: `'${folderId}' in parents`
+        fields: 'files(id, name, webViewLink)',
+        q: `'${folderId}' in parents and name contains '${extension}'`
     })
         .then((res) => res.data.files)
         .catch((err) => console.log('The API returned an error: ' + err))

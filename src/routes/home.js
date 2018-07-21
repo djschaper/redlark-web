@@ -38,7 +38,7 @@ const handler = (request, reply) => {
                 else if (aName > bName) return 1
                 else return 0
             })
-            folders.forEach(folder => $('#songsBody').append(`<tr><td>${folder.name}</td></tr>`))
+            folders.forEach(folder => $('#song-list').append(`<div class="song" id="${folder.id}" draggable="true" ondragstart="drag(event)"><button onClick="displayPDF('${folder.id}')">${folder.name}</button></div>`))
             html = $.html()
 
             reply.writeHead(200)
