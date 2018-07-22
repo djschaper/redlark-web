@@ -1,3 +1,26 @@
+const MUSICAL_KEYS = [
+    'Ab',
+    'A',
+    'A#',
+    'Bb',
+    'B',
+    'C',
+    'C#',
+    'Db',
+    'D',
+    'D#',
+    'Eb',
+    'E',
+    'F',
+    'F#',
+    'Gb',
+    'G',
+    'G#',
+]
+// Add the minors programmatically because I'm lazy
+MUSICAL_KEYS.concat(MUSICAL_KEYS.map(key => key + 'm'))
+const SHEET_MUSIC_DELIMITER = 'sheet'
+
 const pdfWindow = document.getElementById('pdf-window')
 const fileSelector = document.getElementById('file-selector')
 const setSongList = document.getElementById('set-song-list')
@@ -22,12 +45,38 @@ function getSongFiles(folder) {
             }
 
             // Add new files to list
-            files.forEach(file => {
+            const options = files.map(file => {
                 const option = document.createElement('option')
                 option.setAttribute('value', file.link)
-                option.innerText = file.name
-                fileSelector.appendChild(option)
+                const filenameSplit = file.name.replace('.pdf', '').split('-')
+                let key = filenameSplit[filenameSplit.length - 1].trim()
+                const isSheetMusic = key.toLowerCase().includes(SHEET_MUSIC_DELIMITER)
+                if (isSheetMusic) key = key.split(' ')[0].trim()
+
+                let optionText = file.name
+                if (MUSICAL_KEYS.includes(key)) {
+                    optionText = key
+                    if (isSheetMusic) {
+                        optionText = optionText + ' (Sheet)'
+                    }
+                }
+
+                option.innerText = optionText
+                return option
             })
+
+            // Sort keys alphabetically, with unrecognized name formats at bottom
+            options.sort((a, b) => {
+                const aTitle = a.innerText
+                const bTitle = b.innerText
+                if (aTitle.includes('.')) return 1
+                if (bTitle.includes('.')) return -1
+
+                if (aTitle < bTitle) return -1
+                else if (aTitle > bTitle) return 1
+                else return 0
+            })
+            options.forEach(option => fileSelector.appendChild(option))
         }
     }
     xhttp.open("GET", `/song?folder=${folder}`, true)
