@@ -4,36 +4,8 @@
     <title>FBC Redlark</title>
     <link rel="stylesheet" type="text/css" href="../styles/main.css">
     <link rel="shortcut icon" type="image/x-icon" href="../assets/favicon.ico" />
-    <script>
-        function displayPDF(folder) {
-            var xhttp = new XMLHttpRequest()
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    const link = this.responseText
-                    document.getElementById("pdf-window").setAttribute('src', link)
-                }
-            }
-            xhttp.open("GET", `/song?folder=${folder}`, true)
-            xhttp.send()
-        }
-
-        function allowDrop(event) {
-            event.preventDefault()
-        }
-
-        function drag(event) {
-            event.dataTransfer.setData("text/plain", event.target.id)
-        }
-
-        function drop(event, targetId) {
-            event.preventDefault()
-            var elementId = event.dataTransfer.getData("text")
-            var element = document.getElementById(elementId)
-            var copy = element.cloneNode(true)
-            copy.removeAttribute("id")
-            document.getElementById(targetId).appendChild(copy)
-        }
-    </script>
+    <!--Exterior sources-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
 </head>
 <body>
     <div id="page">
@@ -67,7 +39,8 @@
                 <div id="set" class="section">
                     <div class="section-content">
                         <h2>Set</h2>
-                        <ul id="set-song-list" class="object-list-editable" ondrop="drop(event, 'set-song-list')" ondragover="allowDrop(event)"></ul>
+                        <ul id="set-song-list" class="object-list-editable">
+                        </ul>
                     </div>
                 </div>
                 <div id="team" class="section">
@@ -81,6 +54,7 @@
             <div id="preview" class="section">
                 <div class="section-content">
                     <h2>Preview</h2>
+                    <select id="file-selector"></select>
                     <iframe id="pdf-window"></iframe>
                 </div>
 
@@ -90,6 +64,7 @@
 
     </div>
 
-
+    <script src="//rubaxa.github.io/Sortable/Sortable.js"></script>
+    <script src="../scripts/home.js"></script>
 </body>
 </html>

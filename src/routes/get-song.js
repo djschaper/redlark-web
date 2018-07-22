@@ -7,12 +7,18 @@ const handler = (request, reply) => {
         const key = request.query.key
         return gdrive.listFilesInFolder(songFolderId, 'pdf')
             .then(files => {
-                console.log(JSON.stringify(files))
-                const file = files[0]
-                const viewLink = files[0].webViewLink
-                const previewLink = viewLink.substring(0, viewLink.indexOf('view?')) + 'preview'
+                const songFiles = files.map(file => {
+                    const viewLink = file.webViewLink
+                    const link = viewLink.substring(0, viewLink.indexOf('view?')) + 'preview'
+
+                    return {
+                        link,
+                        name: file.name
+                    }
+                })
+
                 reply.writeHead(200)
-                reply.write(previewLink)
+                reply.write(JSON.stringify(songFiles))
                 return reply.end()
             })
     }

@@ -3,12 +3,14 @@ const http = require('http')
 const url = require('url')
 const fs = require('fs')
 const glob = require('glob')
+const path = require('path')
 
 const { authorizeRoute } = require('./lib/auth')
 
 const SERVING_FOLDERS = [
     'styles',
-    'assets'
+    'assets',
+    'scripts'
 ]
 
 console.info = (message) => console.log('[INFO] ' + message)
@@ -66,6 +68,23 @@ const server = http.createServer((request, reply) => {
             if (SERVING_FOLDERS.includes(folder)) {
                 const relativeFilePath = '.' + request.path
                 const file = fs.readFileSync(relativeFilePath)
+                const extension = path.extname(relativeFilePath)
+                let contentType = 'text/plain'
+                switch (extension) {
+                    case '.css':
+                        contentType = 'text/css'
+                        break
+                    case '.js':
+                        contentType = 'application/javascript'
+                        break
+                    case '.ico':
+                        contentType = 'image/x-icon'
+                        break
+                    case '.png', '.gif':
+                        contentType = `image/${extension.replace('.', '')}`
+                        break
+                }
+                reply.setHeader('content-type', contentType)
                 reply.write(file)
                 return reply.end()
             }
