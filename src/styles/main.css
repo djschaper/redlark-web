@@ -137,6 +137,34 @@ h2 {
     min-width: 300px;
 }
 
+#song-searchbox-container {
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 0.5px solid grey;
+    display: flex;
+    flex-direction: row;
+    align-content: flex-end;
+    align-items: center;
+    background-color: white;
+}
+
+#song-searchbox {
+    border: none;
+    background-color: transparent;
+    font-size: medium;
+    padding: 5px;
+    flex-grow: 1;
+}
+
+    #song-searchbox:focus {
+        outline-width: 0;
+    }
+
+#song-searchbox-container i {
+    padding: 5px;
+    opacity: 0.5;
+}
+
 #set-team {
     height: 100%;
     width: 300px;
@@ -171,13 +199,13 @@ h2 {
     list-style-type: none;
     padding: 5px;
     padding-bottom: 3px;
-    border: 1px dashed;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     min-height: 100px;
     max-height: 100%;
     overflow: auto;
+    background-color: rgba(0,0,0, 0.05);
 }
 
     .object-list::-webkit-scrollbar, .object-list-editable::-webkit-scrollbar {

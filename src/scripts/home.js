@@ -1,6 +1,13 @@
-const pdfWindow = document.getElementById("pdf-window")
+const pdfWindow = document.getElementById('pdf-window')
 const fileSelector = document.getElementById('file-selector')
 const setSongList = document.getElementById('set-song-list')
+const songList = document.getElementById('song-list')
+const songSearchbox = document.getElementById('song-searchbox')
+
+const allSongs = Array.from(songList.children).map(song => ({
+    title: song.innerText.toLowerCase(),
+    html: song.outerHTML
+}))
 
 function getSongFiles(folder) {
     var xhttp = new XMLHttpRequest()
@@ -13,6 +20,7 @@ function getSongFiles(folder) {
             while (fileSelector.firstChild) {
                 fileSelector.removeChild(fileSelector.firstChild)
             }
+
             // Add new files to list
             files.forEach(file => {
                 const option = document.createElement('option')
@@ -26,11 +34,11 @@ function getSongFiles(folder) {
     xhttp.send()
 }
 
+// Handle drag and drop
 let dragged
 
 const drag = (event) => {
     dragged = event.target
-    console.log(`Saved dragged object: ${dragged}`)
 }
 
 const allowDrop = (event) => {
@@ -61,8 +69,7 @@ const removeElement = (event, parentId) => {
     dragged = null
 }
 
-console.log('Setting up event listeners...')
-
+// Set up event listeners
 setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
 
@@ -77,3 +84,11 @@ const setSongListSortable = Sortable.create(setSongList, {
 fileSelector.addEventListener('change', (event) => {
     pdfWindow.setAttribute('src', event.target.value)
 })
+
+const searchSongs = (event) => {
+    const search = event.target.value.toLowerCase()
+    songList.innerText = ''
+    songList.innerHTML = allSongs.filter(song => song.title.indexOf(search) >= 0).map(song => song.html).join('')
+}
+// Use timeout to wait for the value to be written to the event target
+songSearchbox.addEventListener('keydown', (event) => setTimeout(() => searchSongs(event), 50))
