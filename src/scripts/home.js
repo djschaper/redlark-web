@@ -37,12 +37,9 @@ function getSongFiles(folder) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             const files = JSON.parse(this.responseText)
-            pdfWindow.setAttribute('src', files[0].link)
 
             // Clear file list
-            while (fileSelector.firstChild) {
-                fileSelector.removeChild(fileSelector.firstChild)
-            }
+            fileSelector.innerText = ''
 
             // Add new files to list
             const options = files.map(file => {
@@ -77,6 +74,9 @@ function getSongFiles(folder) {
                 else return 0
             })
             options.forEach(option => fileSelector.appendChild(option))
+
+            // Set PDf preview to first option
+            pdfWindow.setAttribute('src', options[0].value)
         }
     }
     xhttp.open("GET", `/song?folder=${folder}`, true)
