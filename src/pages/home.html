@@ -20,9 +20,21 @@
                 <li><a href="#">Records</a></li>
             </ul>
 
-            <form id="logout-button" action="/logout" method="post">
-                <input type="submit" name="submit" value="Logout" />
-            </form>
+            <div id="profile">
+                <i id="profile-icon" class="fas fa-user-circle"></i>
+                <div id="profile-menu">
+                    <div id="profile-menu-triangle"></div>
+                    <div id="profile-menu-options">
+                        <form onsubmit="return false">
+                            <button id="profile-button" type="submit"><i class="fas fa-cog"></i>Profile</button>
+                        </form>
+                        <form action="/logout" method="post">
+                            <button id="logout-button" type="submit"><i class="fas fa-sign-out-alt"></i>Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
 
@@ -35,7 +47,9 @@
                         <input id="song-searchbox" type="text" />
                         <i class="fas fa-search"></i>
                     </div>
-                    <ul id="song-list" class="object-list"></ul>
+                    <ul id="song-list" class="object-list">
+                        <div class="loader"></div>
+                    </ul>
                 </div>
             </div>
 
@@ -43,8 +57,7 @@
                 <div id="set" class="section">
                     <div class="section-content">
                         <h2>Set</h2>
-                        <ul id="set-song-list" class="object-list-editable">
-                        </ul>
+                        <ul id="set-song-list" class="object-list-editable"></ul>
                     </div>
                 </div>
                 <div id="team" class="section">

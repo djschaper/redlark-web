@@ -1,0 +1,6 @@
+<div class='song' draggable='true' ondragstart="drag(event)" ondragend="dragEnd(event)" onclick="getSongFiles(event)">
+    <div class='song-title-container'>
+        <span class='song-title' onmouseover="scrollText(event)" onmouseout="resetText(event)" onmouseup="resetText(event)" onclick="resetText(event)"></span>
+    </div>
+    <i class="fas fa-minus-circle remove" onclick="deleteParent(event)"></i>
+</div>

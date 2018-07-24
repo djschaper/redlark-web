@@ -7,6 +7,7 @@ html {
 
 h2 {
     padding-bottom: 10px;
+    color: #333333;
 }
 
 #root {
@@ -26,8 +27,8 @@ h2 {
     justify-content: space-between;
     margin: 0;
     background: #6b727a;
-    height: 38px;
-    min-height: 38px;
+    height: 40px;
+    min-height: 40px;
 }
 
 #header * {
@@ -37,31 +38,8 @@ h2 {
 #page-title {
     color: white;
     margin-left: 10px;
+    min-width: 185px;
 }
-
-#logout-button {
-    align-self: center;
-    margin-right: 10px;
-}
-
-    #logout-button input {
-        background-color: #5b5f65;
-        border: none;
-        color: white;
-        padding: 4px;
-        padding-left: 10px;
-        padding-right: 10px;
-        border-radius: 3px;
-        transition-duration: 0.1s;
-    }
-
-        #logout-button input:hover {
-            background-color: #dc7700;
-        }
-
-        #logout-button input:active {
-            background-color: #fb8800;
-        }
 
 #nav {
     list-style-type: none;
@@ -108,23 +86,123 @@ h2 {
             transition-duration: 0s;
         }
 
+#profile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-self: flex-start;
+    align-items: flex-end;
+}
+
+    #profile:hover #profile-menu {
+        visibility: visible;
+        opacity: 1;
+    }
+
+#profile-icon {
+    font-size: 30px;
+    padding: 6px;
+    color: white;
+}
+
+#profile-menu {
+    transition-duration: 0.2s;
+    visibility: hidden;
+    opacity: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#profile-menu-triangle {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-bottom: 7px solid #6b727a;
+    margin-right: 20px;
+}
+
+#profile-menu-options {
+    background-color: #6b727a;
+    margin-right: 20px;
+    border-radius: 5px 0px 5px 5px;
+    padding: 5px;
+}
+
+    #profile-menu-options button {
+        text-align: right;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border: 1px solid transparent;
+        background-color: transparent;
+        border-radius: 4px;
+        font-size: medium;
+        font-weight: bold;
+        color: white;
+        transition-duration: 0.1s;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+        #profile-menu-options button:focus {
+            outline-width: 0;
+        }
+
+    #profile-menu-options input {
+        background-color: transparent;
+        border: none;
+    }
+
+    #profile-menu-options i {
+        padding-right: 5px;
+    }
+
+    #profile-menu-options #logout-button {
+        margin-bottom: 0;
+    }
+
+        #profile-menu-options #logout-button:hover {
+            background-color: #dc7700;
+            border: 1px solid #cc6e00;
+        }
+
+        #profile-menu-options #logout-button:active {
+            background-color: #fb8800;
+            transition-duration: 0s;
+        }
+
+    #profile-menu-options #profile-button:hover {
+        background-color: #4176b5;
+        border: 1px solid #346299;
+    }
+
+    #profile-menu-options #profile-button:active {
+        background-color: #4e8edb;
+        transition-duration: 0s;
+    }
+
 #content {
     height: 100%;
-    background-color: gold;
     display: flex;
+    background-color: #dae3ed;
 }
 
 .section {
-    background-color: #edf3f9;
+    /*background-color: #edf3f9;*/
 }
 
 .section-content {
     padding: 10px;
-    margin: 0;
+    margin: 5px;
     display: flex;
     flex-direction: column;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
+    height: calc(100% - 30px);
+    width: calc(100% - 30px);
+    background-color: #eaf0f7;
+    border-radius: 10px;
 }
 
     .section-content * {
@@ -133,8 +211,8 @@ h2 {
 
 #songs {
     height: 100%;
-    width: 300px;
-    min-width: 300px;
+    width: 320px;
+    min-width: 320px;
 }
 
 #song-searchbox-container {
@@ -154,6 +232,8 @@ h2 {
     font-size: medium;
     padding: 5px;
     flex-grow: 1;
+    min-height: 25px;
+    max-height: 25px;
 }
 
     #song-searchbox:focus {
@@ -174,18 +254,32 @@ h2 {
 }
 
 #set {
-    background-color: #dae3ed;
+    /*background-color: #dae3ed;*/
     height: 50%;
     min-height: 200px;
     width: calc(100%-2px);
 }
 
+    #set .section-content {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        width: calc(100% - 20px);
+        height: calc(100% - 25px);
+    }
+
 #team {
-    background-color: #e1e9f2;
+    /*background-color: #e1e9f2;*/
     height: 50%;
     min-height: 200px;
     width: calc(100%-2px);
 }
+
+    #team .section-content {
+        margin-left: 0;
+        margin-right: 0;
+        width: calc(100% - 20px);
+    }
 
 #preview {
     height: 100%;
@@ -205,7 +299,7 @@ h2 {
     min-height: 100px;
     max-height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0, 0.05);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.08);
 }
 
     .object-list::-webkit-scrollbar, .object-list-editable::-webkit-scrollbar {
@@ -217,58 +311,110 @@ h2 {
 }
 
 .song {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: flex-end;
     min-height: 25px;
-    overflow: hidden;
+    max-height: 25px;
     margin-bottom: 2px;
-    background-color: none;
+    border-radius: 4px;
+    background-color: white;
+    border: 1px solid #6b727a;
 }
 
-    .song button {
-        text-align: left;
-        font-size: medium;
-        background-color: #f3f7fb;
-        border: 1px solid #6b727a;
-        border-radius: 4px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 100%;
-        height: 25px;
-        position: relative;
-    }
-
-    .song .remove {
-        opacity: 0;
-        position: absolute;
-        right: 3px;
-    }
-
-    .song button:hover {
+    .song:hover {
         background-color: #dae3ed;
     }
 
-#song-list .song button:hover {
+    .song .song-title-container {
+        flex-grow: 1;
+        background-color: transparent;
+        border: none;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .song .song-title {
+        background-color: transparent;
+        padding-left: 5px;
+        font-size: medium;
+        text-align: left;
+        white-space: nowrap;
+        position: relative;
+        left: 0;
+    }
+
+    .song .remove {
+        display: none;
+        opacity: 0;
+        padding: 3px;
+        color: #c12600;
+        transition-duration: 0.5s;
+    }
+
+#song-list .song:hover {
     transition-duration: 0.1s;
     width: calc(100% - 5px);
     transform: translateX(5px);
 }
 
-#set-song-list .song button:hover .remove {
+#set-song-list .song:hover .remove {
+    display: block;
     opacity: 1;
-    transition-duration: 0.2s;
+    transition-duration: 0.5s;
 }
 
 #pdf-window {
     height: 100vh;
     width: 100%;
+    background-color: lightgrey;
 }
 
 #file-selector {
     min-width: 50px;
-    min-height: 35px;
-    max-height: 35px;
-    height: 35px;
+    min-height: 30px;
+    max-height: 30px;
     padding: 2px;
     margin-bottom: 10px;
     align-self: flex-start;
+    border-radius: 5px;
 }
+
+    #file-selector:focus {
+        outline: 0;
+    }
+
+.loader {
+    border: 5px solid transparent;
+    border-radius: 50%;
+    border-top: 5px solid #3498db;
+    width: 30px;
+    height: 30px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    align-self: center;
+    margin: 50px;
+}
+
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }

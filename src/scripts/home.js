@@ -17,23 +17,40 @@ const MUSICAL_KEYS = [
     'G',
     'G#',
 ]
-// Add the minors programmatically because I'm lazy
 MUSICAL_KEYS.concat(MUSICAL_KEYS.map(key => key + 'm'))
 const SHEET_MUSIC_DELIMITER = 'sheet'
+const SET_ID_PREFIX = 'SET-ID:'
 
+// Common objects
 const pdfWindow = document.getElementById('pdf-window')
 const fileSelector = document.getElementById('file-selector')
 const setSongList = document.getElementById('set-song-list')
 const songList = document.getElementById('song-list')
 const songSearchbox = document.getElementById('song-searchbox')
 
-const allSongs = Array.from(songList.children).map(song => ({
-    title: song.innerText.toLowerCase(),
-    html: song.outerHTML
-}))
+let allSongs = []
 
-function getSongFiles(folder) {
-    var xhttp = new XMLHttpRequest()
+// Functions
+getSongList = () => {
+    const xhttp = new XMLHttpRequest()
+    xhttp.responseType = 'document';
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const songListXML = this.responseXML
+            songList.innerHTML = songListXML.body.innerHTML
+
+            allSongs = Array.from(songList.children).map(song => ({
+                title: song.innerText.toLowerCase(),
+                html: song.outerHTML
+            }))
+        }
+    }
+    xhttp.open("GET", `/songs`, true)
+    xhttp.send()
+}
+
+const getSongFiles = (event) => {
+    const xhttp = new XMLHttpRequest()
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             const files = JSON.parse(this.responseText)
@@ -79,48 +96,94 @@ function getSongFiles(folder) {
             pdfWindow.setAttribute('src', options[0].value)
         }
     }
-    xhttp.open("GET", `/song?folder=${folder}`, true)
+    const folderId = event.currentTarget.id.split(SET_ID_PREFIX)[0]
+    xhttp.open("GET", `/song?folder=${folderId}`, true)
     xhttp.send()
 }
 
 // Handle drag and drop
-let dragged
-
-const drag = (event) => {
-    dragged = event.target
-}
+let dragged = null
 
 const allowDrop = (event) => {
     event.preventDefault()
 }
 
-let setSongId = 0;
-
-const addToSet = (event) => {
-    if (setSongList.contains(dragged)) {
-        return
+const drag = (event) => {
+    dragged = event.target
+    const title = dragged.querySelector('.song-title')
+    if (title) {
+        title.style.display = 'block'
+        event.dataTransfer.setDragImage(dragged, dragged.offsetWidth / 2, dragged.offsetHeight / 2)
+        resetTextForElement(title)
     }
+}
+
+const dragEnd = (event) => {
+    const title = dragged.querySelector('.song-title')
+    if (title) {
+        title.style.display = 'unset';
+    }
+    dragged = null;
+}
+
+let setSongId = 0;
+const addToSet = (event) => {
+    if (!dragged) return
+
+    // Don't add if dragging from set back to set
+    if (dragged.parentElement === setSongList) return
+
+    // Prevent arbitrary elements being dragged into set
+    if (dragged.className !== 'song') return
 
     event.preventDefault()
     const copy = dragged.cloneNode(true)
-    copy.setAttribute("id", `${dragged.getAttribute("id")}-${setSongId}`)
+    copy.setAttribute("id", dragged.getAttribute("id") + SET_ID_PREFIX + setSongId)
     setSongId++
+
+    const songTitle = copy.querySelector('.song-title')
+    songTitle.style.display = 'unset'
+    resetTextForElement(songTitle)
+
     setSongList.appendChild(copy)
-    dragged = null
 }
 
-const removeElement = (event, parentId) => {
-    event.preventDefault()
-    const parent = document.getElementById(parentId)
-    if (parent.contains(dragged)) {
-        parent.removeChild(dragged)
+const deleteParent = (event) => event.target.parentElement.remove()
+
+const scrollText = (event) => {
+    const titleWidth = event.target.offsetWidth
+    const containerWidth = event.target.parentElement.clientWidth
+    const rightPaddingPx = 5
+
+    if (titleWidth > containerWidth) {
+        const diff = titleWidth - containerWidth
+        event.target.style.transitionDelay = '0.5s'
+        event.target.style.transitionDuration = `${0.02 * diff}s`
+        event.target.style.left = `${-1 * (diff + rightPaddingPx)}px`
     }
-    dragged = null
+}
+
+const resetText = (event) => {
+    const titleWidth = event.target.offsetWidth
+    const containerWidth = event.target.parentElement.clientWidth
+
+    if (titleWidth > containerWidth) {
+        resetTextForElement(event.target)
+    }
+}
+
+const resetTextForElement = (elem) => {
+    elem.style.transitionDelay = '0s'
+    elem.style.transitionDuration = '0s'
+    elem.style.left = '0'
 }
 
 // Set up event listeners
 setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
+
+// Initialize song list
+getSongList()
 
 const setSongListSortable = Sortable.create(setSongList, {
     filter: '.remove',
