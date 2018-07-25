@@ -178,19 +178,15 @@ const resetTextForElement = (elem) => {
     elem.style.left = '0'
 }
 
+// Initialize song list
+getSongList()
+
 // Set up event listeners
 setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
 
-// Initialize song list
-getSongList()
-
-const setSongListSortable = Sortable.create(setSongList, {
-    filter: '.remove',
-    onFilter: function (evt) {
-        var el = setSongListSortable.closest(evt.item); // get dragged item
-        el && el.parentNode.removeChild(el);
-    }
+Sortable.create(setSongList, {
+    draggable: '.song'
 })
 
 fileSelector.addEventListener('change', (event) => {
