@@ -10,26 +10,26 @@
 <body>
     <div id="page">
 
-        <div id="header">
+        <div id="header" class="menu">
             <h1 id="page-title">FBC Redlark</h1>
 
             <ul id="nav">
-                <li><a href="#">Songs</a></li>
-                <li><a href="#">Sets</a></li>
-                <li><a href="#">Teams</a></li>
-                <li><a href="#">Records</a></li>
+                <li class="menu-button"><a href="#">Songs</a></li>
+                <li class="menu-button"><a href="#">Sets</a></li>
+                <li class="menu-button"><a href="#">Teams</a></li>
+                <li class="menu-button"><a href="#">Records</a></li>
             </ul>
 
             <div id="profile">
                 <i id="profile-icon" class="fas fa-user-circle"></i>
                 <div id="profile-menu">
                     <div id="profile-menu-triangle"></div>
-                    <div id="profile-menu-options">
+                    <div id="profile-menu-options" class="menu">
                         <form onsubmit="return false">
-                            <button id="profile-button" type="submit"><i class="fas fa-cog"></i>Profile</button>
+                            <button class="menu-button" id="profile-button" type="submit"><i class="fas fa-cog"></i>Profile</button>
                         </form>
                         <form action="/logout" method="post">
-                            <button id="logout-button" type="submit"><i class="fas fa-sign-out-alt"></i>Logout</button>
+                            <button class="menu-button" id="logout-button" type="submit"><i class="fas fa-sign-out-alt"></i>Logout</button>
                         </form>
                     </div>
                 </div>

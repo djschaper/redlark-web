@@ -186,7 +186,8 @@ setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
 
 Sortable.create(setSongList, {
-    draggable: '.song'
+    draggable: '.song',
+    animation: 150
 })
 
 fileSelector.addEventListener('change', (event) => {

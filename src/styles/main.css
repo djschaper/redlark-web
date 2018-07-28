@@ -21,12 +21,15 @@ h2 {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
+.menu {
+    background-color: #1d2838;
+}
+
 #header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     margin: 0;
-    background: #6b727a;
     height: 40px;
     min-height: 40px;
 }
@@ -41,6 +44,21 @@ h2 {
     min-width: 185px;
 }
 
+.menu-button {
+    background-color: transparent;
+    border: 1px solid transparent;
+}
+
+    .menu-button:hover {
+        background-color: #2589bd;
+        border: 1px solid #175a7c;
+    }
+
+    .menu-button:active {
+        background-color: #2aa2e0;
+        transition-duration: 0s;
+    }
+
 #nav {
     list-style-type: none;
     transition-duration: 1s;
@@ -51,9 +69,7 @@ h2 {
 
     #nav li {
         transform: skew(-20deg);
-        border: 1px solid #6b727a;
         border-radius: 0 0 5px 5px;
-        background: #6b727a;
         height: 20px;
         padding-left: 30px;
         padding-right: 30px;
@@ -75,15 +91,8 @@ h2 {
         }
 
         #nav li:hover {
-            background-color: #4176b5;
-            border: 1px solid #346299;
             border-top: 0px solid;
             padding-top: 18px;
-        }
-
-        #nav li:active {
-            background-color: #4e8edb;
-            transition-duration: 0s;
         }
 
 #profile {
@@ -119,12 +128,11 @@ h2 {
     width: 0;
     height: 0;
     border-left: 20px solid transparent;
-    border-bottom: 7px solid #6b727a;
+    border-bottom: 7px solid #1d2838;
     margin-right: 20px;
 }
 
 #profile-menu-options {
-    background-color: #6b727a;
     margin-right: 20px;
     border-radius: 5px 0px 5px 5px;
     padding: 5px;
@@ -136,8 +144,6 @@ h2 {
         padding-right: 15px;
         padding-top: 10px;
         padding-bottom: 10px;
-        border: 1px solid transparent;
-        background-color: transparent;
         border-radius: 4px;
         font-size: medium;
         font-weight: bold;
@@ -174,20 +180,10 @@ h2 {
             transition-duration: 0s;
         }
 
-    #profile-menu-options #profile-button:hover {
-        background-color: #4176b5;
-        border: 1px solid #346299;
-    }
-
-    #profile-menu-options #profile-button:active {
-        background-color: #4e8edb;
-        transition-duration: 0s;
-    }
-
 #content {
     height: 100%;
     display: flex;
-    background-color: #dae3ed;
+    background-color: #adc698;
 }
 
 .section {
@@ -201,8 +197,8 @@ h2 {
     flex-direction: column;
     height: calc(100% - 30px);
     width: calc(100% - 30px);
-    background-color: #eaf0f7;
-    border-radius: 10px;
+    background-color: white;
+    border-radius: 5px;
 }
 
     .section-content * {
@@ -320,12 +316,14 @@ h2 {
     max-height: 25px;
     margin-bottom: 2px;
     border-radius: 4px;
-    background-color: white;
-    border: 1px solid #6b727a;
+    background-color: #fffff7;
+    border: 1px solid #e8e8da;
 }
 
     .song:hover {
-        background-color: #dae3ed;
+        background-color: #6dccff;
+        border-color: #2589bd;
+        cursor: default;
     }
 
     .song .song-title-container {
@@ -350,7 +348,7 @@ h2 {
         display: none;
         opacity: 0;
         padding: 3px;
-        color: #c12600;
+        color: #1d2838;
         transition-duration: 0.5s;
     }
 
