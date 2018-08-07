@@ -1,6 +1,6 @@
 {
   "name": "fbc-redlark",
-  "version": "0.2.17",
+  "version": "0.3.1",
   "private": true,
   "scripts": {
     "build": "node -e \"require('./bin/deploy.js').build()\"",
