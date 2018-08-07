@@ -1,4 +1,4 @@
-const MUSICAL_KEYS = [
+const MAJOR_MUSICAL_CHORDS = [
     'Ab',
     'A',
     'A#',
@@ -17,7 +17,8 @@ const MUSICAL_KEYS = [
     'G',
     'G#',
 ]
-MUSICAL_KEYS.concat(MUSICAL_KEYS.map(key => key + 'm'))
+const MINOR_MUSICAL_CHORDS = MAJOR_MUSICAL_CHORDS.map(key => key + 'm')
+const MUSICAL_CHORDS = [...MAJOR_MUSICAL_CHORDS, ...MINOR_MUSICAL_CHORDS]
 const SHEET_MUSIC_DELIMITER = 'sheet'
 const SET_ID_PREFIX = 'SET-ID:'
 
@@ -31,7 +32,7 @@ const songSearchbox = document.getElementById('song-searchbox')
 let allSongs = []
 
 // Functions
-getSongList = () => {
+const getSongList = () => {
     const xhttp = new XMLHttpRequest()
     xhttp.responseType = 'document';
     xhttp.onreadystatechange = function () {
@@ -49,14 +50,45 @@ getSongList = () => {
     xhttp.send()
 }
 
+const parseChord = (str) => {
+    if (MUSICAL_CHORDS.includes(str)) return str;
+    return null;
+}
+
+const selectSongKey = (preferPreset = false) => {
+    let option = fileSelector.options[fileSelector.selectedIndex]
+
+    // Save key for song in set
+    const songId = fileSelector.getAttribute('data-song-id')
+    if (songId.includes(SET_ID_PREFIX)) {
+        const song = document.getElementById(songId)
+
+        const key = parseChord(song.getElementsByClassName('key')[0].innerText)
+        if (preferPreset && key) {
+            // User has already picked a key for this song in the set, so use that
+            optionIndex = Array.from(fileSelector.options).findIndex(opt => opt.getAttribute('data-key') === key)
+            fileSelector.selectedIndex = optionIndex
+            option = fileSelector.options[optionIndex]
+        } else {
+            // First time we are selecting a key, so pick default and update song
+            song.getElementsByClassName('key')[0].innerText = option.getAttribute('data-key')
+        }
+    }
+
+    // Update preview window
+    pdfWindow.setAttribute('src', option.value)
+}
+
 const getSongFiles = (event) => {
     const xhttp = new XMLHttpRequest()
+    const song = event.currentTarget.parentElement
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             const files = JSON.parse(this.responseText)
 
             // Clear file list
             fileSelector.innerText = ''
+            fileSelector.setAttribute('data-song-id', song.id)
 
             // Add new files to list
             const options = files.map(file => {
@@ -68,11 +100,14 @@ const getSongFiles = (event) => {
                 if (isSheetMusic) key = key.split(' ')[0].trim()
 
                 let optionText = file.name
-                if (MUSICAL_KEYS.includes(key)) {
+                if (MUSICAL_CHORDS.includes(key)) {
                     optionText = key
+                    option.setAttribute('data-key', key)
                     if (isSheetMusic) {
                         optionText = optionText + ' (Sheet)'
                     }
+                } else {
+                    option.setAttribute('data-key', '?')
                 }
 
                 option.innerText = optionText
@@ -93,10 +128,10 @@ const getSongFiles = (event) => {
             options.forEach(option => fileSelector.appendChild(option))
 
             // Set PDf preview to first option
-            pdfWindow.setAttribute('src', options[0].value)
+            selectSongKey(true)
         }
     }
-    const folderId = event.currentTarget.id.split(SET_ID_PREFIX)[0]
+    const folderId = song.id.split(SET_ID_PREFIX)[0]
     xhttp.open("GET", `/song?folder=${folderId}`, true)
     xhttp.send()
 }
@@ -126,7 +161,7 @@ const dragEnd = (event) => {
     dragged = null;
 }
 
-let setSongId = 0;
+let setSongIndex = 0;
 const addToSet = (event) => {
     if (!dragged) return
 
@@ -138,8 +173,9 @@ const addToSet = (event) => {
 
     event.preventDefault()
     const copy = dragged.cloneNode(true)
-    copy.setAttribute("id", dragged.getAttribute("id") + SET_ID_PREFIX + setSongId)
-    setSongId++
+    const id = dragged.getAttribute("id") + SET_ID_PREFIX + setSongIndex
+    copy.setAttribute("id", id)
+    setSongIndex++
 
     const songTitle = copy.querySelector('.song-title')
     songTitle.style.display = 'unset'
@@ -148,7 +184,7 @@ const addToSet = (event) => {
     setSongList.appendChild(copy)
 }
 
-const deleteParent = (event) => event.target.parentElement.remove()
+const removeFromSet = (event) => event.target.parentElement.remove()
 
 const scrollText = (event) => {
     const titleWidth = event.target.offsetWidth
@@ -190,9 +226,7 @@ Sortable.create(setSongList, {
     animation: 150
 })
 
-fileSelector.addEventListener('change', (event) => {
-    pdfWindow.setAttribute('src', event.target.value)
-})
+fileSelector.addEventListener('change', (event) => selectSongKey())
 
 const searchSongs = (event) => {
     const search = event.target.value.toLowerCase()
