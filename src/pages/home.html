@@ -57,7 +57,26 @@
                 <div id="set" class="section">
                     <div class="section-content">
                         <h2>Set</h2>
-                        <ul id="set-song-list" class="object-list-editable"></ul>
+                        <div id="edit-set-view" class="slidable">
+                            <div id="edit-set-tools" class="toolbar">
+                                <input id="set-name" type="text" placeholder="Unsaved Set" />
+                                <button id="save-set-button" class="dark-button" disabled>
+                                    <i class="fas fa-save"></i>
+                                </button>
+                                <button id="open-set-button" class="dark-button">
+                                    <i class="fas fa-folder-open dark-button"></i>
+                                </button>
+                            </div>
+                            <ul id="set-song-list" class="object-list-editable"></ul>
+                        </div>
+                        <div id="open-set-view" class="slidable">
+                            <div id="open-set-tools" class="toolbar">
+                                <button id="back-to-set-button" class="dark-button">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                            </div>
+                            <ul id="set-list" class="object-list"></ul>
+                        </div>
                     </div>
                 </div>
                 <div id="team" class="section">

@@ -28,6 +28,9 @@ const fileSelector = document.getElementById('file-selector')
 const setSongList = document.getElementById('set-song-list')
 const songList = document.getElementById('song-list')
 const songSearchbox = document.getElementById('song-searchbox')
+const setNameInput = document.getElementById('set-name')
+const saveSetButton = document.getElementById('save-set-button')
+const openSetButton = document.getElementById('open-set-button')
 
 let allSongs = []
 
@@ -72,6 +75,7 @@ const selectSongKey = (preferPreset = false) => {
         } else {
             // First time we are selecting a key, so pick default and update song
             song.getElementsByClassName('key')[0].innerText = option.getAttribute('data-key')
+            updateSaveButton(true)
         }
     }
 
@@ -165,6 +169,8 @@ let setSongIndex = 0;
 const addToSet = (event) => {
     if (!dragged) return
 
+    updateSaveButton(true)
+
     // Don't add if dragging from set back to set
     if (dragged.parentElement === setSongList) return
 
@@ -184,7 +190,10 @@ const addToSet = (event) => {
     setSongList.appendChild(copy)
 }
 
-const removeFromSet = (event) => event.target.parentElement.remove()
+const removeFromSet = (event) => {
+    event.target.parentElement.remove()
+    updateSaveButton(true)
+}
 
 const scrollText = (event) => {
     const titleWidth = event.target.offsetWidth
@@ -235,3 +244,49 @@ const searchSongs = (event) => {
 }
 // Use timeout to wait for the value to be written to the event target
 songSearchbox.addEventListener('keydown', (event) => setTimeout(() => searchSongs(event), 50))
+
+const updateSaveButton = (unsavedChanges) => {
+    // Prevent saving if key is not selected for a song
+    if (Array.from(setSongList.children).some(song => !parseChord(song.querySelector('.key').innerText))) {
+        saveSetButton.setAttribute('disabled', 'disabled')
+        return
+    }
+
+    if (!setNameInput.value || setSongList.childElementCount === 0 || !unsavedChanges) {
+        saveSetButton.setAttribute('disabled', 'disabled')
+    } else {
+        saveSetButton.removeAttribute('disabled')
+    }
+}
+setNameInput.addEventListener('keydown', (event) => setTimeout(() => updateSaveButton(true), 50))
+
+saveSetButton.addEventListener('click', (event) => {
+    updateSaveButton(false)
+})
+
+// Set view transitions
+const editSetView = document.getElementById('edit-set-view')
+const openSetView = document.getElementById('open-set-view')
+const viewTranslationX = editSetView.offsetWidth * 1.1
+
+openSetButton.addEventListener('click', (event) => {
+    editSetView.style.transform = `translateX(-${viewTranslationX}px)`
+    openSetView.style.transform = `translateX(-${viewTranslationX}px)`
+})
+
+
+const goBackToSetView = () => {
+    editSetView.style.transform = 'translateX(0px)'
+    openSetView.style.transform = 'translateX(0px)'
+}
+
+document.getElementById('back-to-set-button').addEventListener('click', (event) => goBackToSetView())
+
+// Position open-set-view at same "y" as edit-set-view, and to the right
+openSetView.style.top = `-${editSetView.offsetHeight}px`
+openSetView.style.left = `${viewTranslationX}px`
+
+const loadSet = (event) => {
+    // Load songs from set
+    goBackToSetView()
+}

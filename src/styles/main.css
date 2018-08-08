@@ -18,6 +18,9 @@ h2 {
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+#page, input, select {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
@@ -153,10 +156,6 @@ h2 {
         margin-bottom: 5px;
     }
 
-        #profile-menu-options button:focus {
-            outline-width: 0;
-        }
-
     #profile-menu-options input {
         background-color: transparent;
         border: none;
@@ -199,10 +198,35 @@ h2 {
     width: calc(100% - 30px);
     background-color: white;
     border-radius: 5px;
+    overflow: hidden;
 }
 
     .section-content * {
         margin: 0;
+    }
+
+:focus {
+    outline: 0;
+}
+
+.dark-button {
+    background-color: transparent;
+    border: none;
+    color: #1d2838;
+    transition-duration: 0.2s;
+    padding: 0;
+}
+
+    .dark-button:hover {
+        color: #2589bd;
+    }
+
+    .dark-button:active {
+        color: #2aa2e0;
+    }
+
+    .dark-button:disabled {
+        color: grey;
     }
 
 #songs {
@@ -214,7 +238,7 @@ h2 {
 #song-searchbox-container {
     margin-bottom: 10px;
     border-radius: 5px;
-    border: 0.5px solid #a9a9a9;
+    border: 1px solid #a9a9a9;
     display: flex;
     flex-direction: row;
     align-content: flex-end;
@@ -232,11 +256,8 @@ h2 {
     padding-left: 10px;
     flex-grow: 1;
     height: 100%;
+    color: #555555;
 }
-
-    #song-searchbox:focus {
-        outline-width: 0;
-    }
 
 #song-searchbox-container i {
     padding: 5px;
@@ -308,8 +329,44 @@ h2 {
     padding-bottom: 30px;
 }
 
-.song {
+.slidable {
+    position: relative;
+    transition-duration: 0.3s;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: row;
     width: 100%;
+    align-items: center;
+}
+
+    .toolbar i {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 10px;
+        font-size: 20px;
+    }
+
+#open-set-tools i {
+    padding-left: 0px;
+}
+
+#set-name {
+    flex-grow: 1;
+    border: none;
+    border-bottom: 1px solid #a9a9a9;
+    font-style: italic;
+    font-size: medium;
+}
+
+#test {
+    display: flex;
+    flex-direction: row;
+}
+
+.song {
+    width: calc(100% - 2px);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -401,11 +458,9 @@ h2 {
     align-self: flex-start;
     border-radius: 5px;
     border-color: #a9a9a9;
+    font-size: medium;
+    color: #555555;
 }
-
-    #file-selector:focus {
-        outline: 0;
-    }
 
 .loader {
     border: 5px solid transparent;
