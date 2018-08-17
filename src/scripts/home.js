@@ -267,7 +267,7 @@ saveSetButton.addEventListener('click', (event) => {
 // Set view transitions
 const editSetView = document.getElementById('edit-set-view')
 const openSetView = document.getElementById('open-set-view')
-const viewTranslationX = editSetView.offsetWidth * 1.1
+const viewTranslationX = editSetView.offsetWidth + 20
 
 openSetButton.addEventListener('click', (event) => {
     editSetView.style.transform = `translateX(-${viewTranslationX}px)`
@@ -281,10 +281,6 @@ const goBackToSetView = () => {
 }
 
 document.getElementById('back-to-set-button').addEventListener('click', (event) => goBackToSetView())
-
-// Position open-set-view at same "y" as edit-set-view, and to the right
-openSetView.style.top = `-${editSetView.offsetHeight}px`
-openSetView.style.left = `${viewTranslationX}px`
 
 const loadSet = (event) => {
     // Load songs from set

@@ -311,12 +311,12 @@ h2 {
 .object-list, .object-list-editable {
     list-style-type: none;
     padding: 5px;
-    padding-bottom: 3px;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
     min-height: 100px;
     max-height: 100%;
+    height: 100%;
     overflow: auto;
     box-shadow: inset 0 0 15px rgba(0,0,0,0.08);
 }
@@ -332,6 +332,17 @@ h2 {
 .slidable {
     position: relative;
     transition-duration: 0.3s;
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 10px);
+}
+
+.slider-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: calc(200% + 20px);
+    justify-content: space-between;
 }
 
 .toolbar {
@@ -339,6 +350,7 @@ h2 {
     flex-direction: row;
     width: 100%;
     align-items: center;
+    margin-bottom: 3px;
 }
 
     .toolbar i {
@@ -360,9 +372,12 @@ h2 {
     font-size: medium;
 }
 
-#test {
-    display: flex;
-    flex-direction: row;
+#edit-set-view {
+    height: 100%;
+}
+
+#set-list {
+    height: 100px;
 }
 
 .song {
