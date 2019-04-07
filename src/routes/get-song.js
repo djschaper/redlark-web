@@ -23,8 +23,8 @@ const handler = (request, reply) => {
             })
     }
 
-    reply.writeHead(200)
-    reply.write('meh')
+    reply.writeHead(400)
+    reply.write('Required query parameter "folder" missing.')
     reply.end()
 }
 

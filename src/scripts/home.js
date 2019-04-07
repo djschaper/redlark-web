@@ -21,6 +21,11 @@ const MINOR_MUSICAL_CHORDS = MAJOR_MUSICAL_CHORDS.map(key => key + 'm')
 const MUSICAL_CHORDS = [...MAJOR_MUSICAL_CHORDS, ...MINOR_MUSICAL_CHORDS]
 const SHEET_MUSIC_DELIMITER = 'sheet'
 const SET_ID_PREFIX = 'SET-ID:'
+const RESPONSE_TYPES = {
+    XML: 'document',
+    JSON: 'json',
+    TEXT: 'text'
+}
 
 // Common objects
 const pdfWindow = document.getElementById('pdf-window')
@@ -31,16 +36,33 @@ const songSearchbox = document.getElementById('song-searchbox')
 const setNameInput = document.getElementById('set-name')
 const saveSetButton = document.getElementById('save-set-button')
 const openSetButton = document.getElementById('open-set-button')
+const setList = document.getElementById('set-list')
 
 let allSongs = []
 
 // Functions
-const getSongList = () => {
+const ajax = (params) => {
+    if (!params.method) params.method = 'GET'
+    if (!params.type) params.type = RESPONSE_TYPES.JSON
+    if (!params.handler) params.handler = (res) => { }
+
     const xhttp = new XMLHttpRequest()
-    xhttp.responseType = 'document';
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            const songListXML = this.responseXML
+    xhttp.responseType = params.type
+    xhttp.onreadystatechange = () => {
+        if (xhttp.readyState === 4 && xhttp.status === 200) {
+            params.handler(xhttp.response)
+        }
+    }
+    xhttp.open(params.method, params.route, true)
+    xhttp.send(params.body)
+}
+
+const getSongList = () => {
+    ajax({
+        method: 'GET',
+        route: '/songs',
+        type: RESPONSE_TYPES.XML,
+        handler: (songListXML) => {
             songList.innerHTML = songListXML.body.innerHTML
 
             allSongs = Array.from(songList.children).map(song => ({
@@ -48,9 +70,7 @@ const getSongList = () => {
                 html: song.outerHTML
             }))
         }
-    }
-    xhttp.open("GET", `/songs`, true)
-    xhttp.send()
+    })
 }
 
 const parseChord = (str) => {
@@ -83,13 +103,26 @@ const selectSongKey = (preferPreset = false) => {
     pdfWindow.setAttribute('src', option.value)
 }
 
-const getSongFiles = (event) => {
-    const xhttp = new XMLHttpRequest()
-    const song = event.currentTarget.parentElement
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            const files = JSON.parse(this.responseText)
+const getSets = () => {
+    ajax({
+        method: 'GET',
+        route: '/sets',
+        type: RESPONSE_TYPES.XML,
+        handler: (sets) => {
+            console.log(sets)
+            setList.innerHTML = sets.body.innerHTML
+        }
+    })
+}
 
+const getSongFiles = (event) => {
+    const song = event.currentTarget.parentElement
+    const folderId = song.id.split(SET_ID_PREFIX)[0]
+    ajax({
+        method: 'GET',
+        route: `/song?folder=${folderId}`,
+        type: RESPONSE_TYPES.JSON,
+        handler: (files) => {
             // Clear file list
             fileSelector.innerText = ''
             fileSelector.setAttribute('data-song-id', song.id)
@@ -134,10 +167,7 @@ const getSongFiles = (event) => {
             // Set PDf preview to first option
             selectSongKey(true)
         }
-    }
-    const folderId = song.id.split(SET_ID_PREFIX)[0]
-    xhttp.open("GET", `/song?folder=${folderId}`, true)
-    xhttp.send()
+    })
 }
 
 // Handle drag and drop
@@ -260,6 +290,10 @@ const updateSaveButton = (unsavedChanges) => {
 }
 setNameInput.addEventListener('keydown', (event) => setTimeout(() => updateSaveButton(true), 50))
 
+const trySaveSet = () => {
+    const setName = document.getElementById('set-name').value
+}
+
 saveSetButton.addEventListener('click', (event) => {
     updateSaveButton(false)
 })
@@ -272,6 +306,7 @@ const viewTranslationX = editSetView.offsetWidth + 20
 openSetButton.addEventListener('click', (event) => {
     editSetView.style.transform = `translateX(-${viewTranslationX}px)`
     openSetView.style.transform = `translateX(-${viewTranslationX}px)`
+    getSets()
 })
 
 
