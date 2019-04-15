@@ -260,11 +260,6 @@ getSongList()
 setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
 
-Sortable.create(setSongList, {
-    draggable: '.song',
-    animation: 150
-})
-
 fileSelector.addEventListener('change', (event) => selectSongKey())
 
 const searchSongs = (event) => {
@@ -321,3 +316,8 @@ const loadSet = (event) => {
     // Load songs from set
     goBackToSetView()
 }
+
+Sortable.create(setSongList, {
+    draggable: '.song',
+    animation: 150
+})

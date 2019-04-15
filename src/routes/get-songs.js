@@ -44,7 +44,7 @@ const handler = (request, reply) =>
 const route = {
     method: 'GET',
     path: '/songs',
-    auth: [AUTH_METHODS.MEMBER],
+    auth: [AUTH_METHODS.NONE],
     handler
 }
 

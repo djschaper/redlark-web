@@ -13,7 +13,7 @@ const handler = (request, reply) => {
 const route = {
     method: 'POST',
     path: '/sets',
-    auth: [AUTH_METHODS.MEMBER],
+    auth: [AUTH_METHODS.NONE],
     handler
 }
 

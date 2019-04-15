@@ -36,7 +36,7 @@ const handler = (request, reply) => {
 const route = {
     method: 'GET',
     path: '/sets',
-    auth: [AUTH_METHODS.MEMBER],
+    auth: [AUTH_METHODS.NONE],
     handler
 }
 

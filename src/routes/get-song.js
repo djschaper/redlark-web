@@ -31,7 +31,7 @@ const handler = (request, reply) => {
 const route = {
     method: 'GET',
     path: '/song',
-    auth: [AUTH_METHODS.MEMBER],
+    auth: [AUTH_METHODS.NONE],
     handler
 }
 

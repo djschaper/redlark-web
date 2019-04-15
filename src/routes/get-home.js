@@ -11,17 +11,18 @@ const mainHTML = fs.readFileSync(path.resolve(__dirname, '../pages/home.html'))
 const handler = (request, reply) => {
     let html = mainHTML
 
-    if (!request.auth[AUTH_TYPES.MEMBER].authorized) {
-        reply.writeHead(200)
-        html = loginHTML
-        if (getFailedLoginFlag(request)) {
-            const $ = cheerio.load(html)
-            $('#badLoginText').removeAttr('hidden')
-            html = $.html()
-        }
-        reply.write(html)
-        return reply.end()
-    }
+    // DEBUG - Remove login temporarily
+    //if (!request.auth[AUTH_TYPES.MEMBER].authorized) {
+    //    reply.writeHead(200)
+    //    html = loginHTML
+    //    if (getFailedLoginFlag(request)) {
+    //        const $ = cheerio.load(html)
+    //        $('#badLoginText').removeAttr('hidden')
+    //        html = $.html()
+    //    }
+    //    reply.write(html)
+    //    return reply.end()
+    //}
 
     reply.writeHead(200)
     reply.write(html)
@@ -31,7 +32,9 @@ const handler = (request, reply) => {
 const route = {
     method: 'GET',
     path: '/',
-    auth: [AUTH_METHODS.NONE, AUTH_METHODS.MEMBER],
+    auth: [AUTH_METHODS.NONE],
+    // DEBUG = Remove login temporarily
+    //auth: [AUTH_METHODS.NONE, AUTH_METHODS.MEMBER],
     handler
 }
 
