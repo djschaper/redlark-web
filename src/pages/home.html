@@ -1,106 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FBC Redlark</title>
-    <link rel="stylesheet" type="text/css" href="../styles/main.css">
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/favicon.ico" />
-    <!--Exterior sources-->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
 </head>
 <body>
-    <div id="page">
-
-        <div id="header" class="menu">
-            <h1 id="page-title">FBC Redlark</h1>
-
-            <ul id="nav">
-                <li class="menu-button"><a href="#">Songs</a></li>
-                <li class="menu-button"><a href="#">Sets</a></li>
-                <li class="menu-button"><a href="#">Teams</a></li>
-                <li class="menu-button"><a href="#">Records</a></li>
+    <div id="songs" class="section">
+        <div class="section-content">
+            <h2>Songs</h2>
+            <div id="song-searchbox-container">
+                <input id="song-searchbox" type="text" />
+                <i class="fas fa-search"></i>
+            </div>
+            <ul id="song-list" class="object-list">
+                <div class="loader"></div>
             </ul>
-
-            <div id="profile">
-                <i id="profile-icon" class="fas fa-user-circle"></i>
-                <div id="profile-menu">
-                    <div id="profile-menu-triangle"></div>
-                    <div id="profile-menu-options" class="menu">
-                        <form onsubmit="return false">
-                            <button class="menu-button" id="profile-button" type="submit"><i class="fas fa-cog"></i>Profile</button>
-                        </form>
-                        <form action="/logout" method="post">
-                            <button class="menu-button" id="logout-button" type="submit"><i class="fas fa-sign-out-alt"></i>Logout</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
         </div>
+    </div>
 
-
-        <div id="content">
-
-            <div id="songs" class="section">
-                <div class="section-content">
-                    <h2>Songs</h2>
-                    <div id="song-searchbox-container">
-                        <input id="song-searchbox" type="text" />
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <ul id="song-list" class="object-list">
-                        <div class="loader"></div>
-                    </ul>
-                </div>
-            </div>
-
-            <div id="set-team">
-                <div id="set" class="section">
-                    <div class="section-content">
-                        <h2>Set</h2>
-                        <div class="slider-container">
-                            <div id="edit-set-view" class="slidable">
-                                <div id="edit-set-tools" class="toolbar">
-                                    <input id="set-name" type="text" placeholder="Unsaved Set" />
-                                    <button id="save-set-button" class="dark-button" disabled>
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                    <button id="open-set-button" class="dark-button">
-                                        <i class="fas fa-folder-open dark-button"></i>
-                                    </button>
-                                </div>
-                                <ul id="set-song-list" class="object-list-editable"></ul>
-                            </div>
-                            <div id="open-set-view" class="slidable">
-                                <div id="open-set-tools" class="toolbar">
-                                    <button id="back-to-set-button" class="dark-button">
-                                        <i class="fas fa-arrow-left"></i>
-                                    </button>
-                                </div>
-                                <ul id="set-list" class="object-list"></ul>
-                            </div>
+    <div id="set-team">
+        <div id="set" class="section">
+            <div class="section-content">
+                <h2>Set</h2>
+                <div class="slider-container">
+                    <div id="edit-set-view" class="slidable">
+                        <div id="edit-set-tools" class="toolbar">
+                            <input id="set-name" type="text" placeholder="Unsaved Set" />
+                            <button id="save-set-button" class="dark-button" disabled>
+                                <i class="fas fa-save"></i>
+                            </button>
+                            <button id="open-set-button" class="dark-button">
+                                <i class="fas fa-folder-open dark-button"></i>
+                            </button>
                         </div>
+                        <ul id="set-song-list" class="object-list-editable"></ul>
                     </div>
-                </div>
-                <div id="team" class="section">
-                    <div class="section-content">
-                        <h2>Team</h2>
-                        <ul id="team-list" class="object-list"></ul>
+                    <div id="open-set-view" class="slidable">
+                        <div id="open-set-tools" class="toolbar">
+                            <button id="back-to-set-button" class="dark-button">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                        <ul id="set-list" class="object-list"></ul>
                     </div>
                 </div>
             </div>
-
-            <div id="preview" class="section">
-                <div class="section-content">
-                    <h2>Preview</h2>
-                    <div>
-                        <label>Key</label>
-                        <select id="file-selector"></select>
-                    </div>
-                    <iframe id="pdf-window"></iframe>
-                </div>
-
+        </div>
+        <div id="team" class="section">
+            <div class="section-content">
+                <h2>Team</h2>
+                <ul id="team-list" class="object-list"></ul>
             </div>
+        </div>
+    </div>
 
+    <div id="preview" class="section">
+        <div class="section-content">
+            <h2>Preview</h2>
+            <div>
+                <label>Key</label>
+                <select id="file-selector"></select>
+            </div>
+            <iframe id="pdf-window"></iframe>
         </div>
 
     </div>

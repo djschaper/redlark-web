@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FBC Redlark</title>
+    <link rel="stylesheet" type="text/css" href="../styles/main.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/favicon.ico" />
+    <!--Exterior sources-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
+    <script src="../scripts/common.js"></script>
+</head>
+<body>
+    <div id="page">
+        <div id="header" class="menu">
+            <h1 id="page-title"><a href="/">FBC Redlark</a></h1>
+
+            <ul id="nav">
+                <li class="menu-button"><a href="#">Songs</a></li>
+                <li class="menu-button"><a href="#">Sets</a></li>
+                <li class="menu-button"><a href="#">Teams</a></li>
+                <li class="menu-button"><a href="#">Records</a></li>
+            </ul>
+
+            <div id="profile">
+                <i id="profile-icon" class="fas fa-user-circle"></i>
+                <div id="profile-menu">
+                    <div id="profile-menu-triangle"></div>
+                    <div id="profile-menu-options" class="menu">
+                        <form action="/settings" method="get">
+                            <button class="menu-button" id="settings-button" type="submit"><i class="fas fa-cog"></i>Settings</button>
+                        </form>
+                        <form action="/logout" method="post">
+                            <button class="menu-button" id="logout-button" type="submit"><i class="fas fa-sign-out-alt"></i>Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content">
+        </div>
+    </div>
+</body>
+</html>

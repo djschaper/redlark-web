@@ -13,7 +13,8 @@ const { authorizeRoute } = require('./lib/auth')
 const SERVING_FOLDERS = [
     'styles',
     'assets',
-    'scripts'
+    'scripts',
+    'pages'
 ]
 
 console.info = (message) => console.log('[INFO] ' + message)
