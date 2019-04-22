@@ -5,6 +5,11 @@ html {
     padding: 0;
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 h2 {
     padding-bottom: 10px;
     color: #333333;
