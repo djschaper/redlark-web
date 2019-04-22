@@ -21,13 +21,8 @@ const MINOR_MUSICAL_CHORDS = MAJOR_MUSICAL_CHORDS.map(key => key + 'm')
 const MUSICAL_CHORDS = [...MAJOR_MUSICAL_CHORDS, ...MINOR_MUSICAL_CHORDS]
 const SHEET_MUSIC_DELIMITER = 'sheet'
 const SET_ID_PREFIX = 'SET-ID:'
-const RESPONSE_TYPES = {
-    XML: 'document',
-    JSON: 'json',
-    TEXT: 'text'
-}
 
-// Common objects
+/// Common objects //////////////////////////////////////////////////////
 const pdfWindow = document.getElementById('pdf-window')
 const fileSelector = document.getElementById('file-selector')
 const setSongList = document.getElementById('set-song-list')
@@ -40,23 +35,7 @@ const setList = document.getElementById('set-list')
 
 let allSongs = []
 
-// Functions
-const ajax = (params) => {
-    if (!params.method) params.method = 'GET'
-    if (!params.type) params.type = RESPONSE_TYPES.JSON
-    if (!params.handler) params.handler = (res) => { }
-
-    const xhttp = new XMLHttpRequest()
-    xhttp.responseType = params.type
-    xhttp.onreadystatechange = () => {
-        if (xhttp.readyState === 4 && xhttp.status === 200) {
-            params.handler(xhttp.response)
-        }
-    }
-    xhttp.open(params.method, params.route, true)
-    xhttp.send(params.body)
-}
-
+/// Functions ///////////////////////////////////////////////////////////
 const getSongList = () => {
     ajax({
         method: 'GET',
@@ -169,6 +148,8 @@ const getSongFiles = (event) => {
         }
     })
 }
+
+/// Main ////////////////////////////////////////////////////////////////
 
 // Handle drag and drop
 let dragged = null
