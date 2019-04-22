@@ -16,7 +16,7 @@
     "migration:create": "sequelize migration:create --name",
     "seed:create": "sequelize seed:create --name",
     "start": "electron .",
-    "start:dev": "cd src && nodemon app.js -e js,mjs,json,html"
+    "start:dev": "nodemon --watch * --ext js,html,css --exec \"electron .\""
   },
   "dependencies": {
     "aws-sdk": "^2.270.1",
@@ -38,7 +38,7 @@
     "electron": "^4.1.4",
     "fs-extra": "^6.0.1",
     "isomorphic-fetch": "^2.2.1",
-    "nodemon": "^1.17.5",
+    "nodemon": "^1.18.11",
     "prompt-promise": "^1.0.3"
   },
   "beanstalkPackage": [
