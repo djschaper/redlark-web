@@ -4,11 +4,13 @@ const http = require('http')
 const url = require('url')
 const fs = require('fs')
 const path = require('path')
+const qs = require('querystring')
 
 const glob = require('glob')
 const AWS = require('aws-sdk')
 
 const { authorizeRoute } = require('./lib/auth')
+const { init: initSettings } = require('./lib/settings')
 
 const SERVING_FOLDERS = [
     'styles',
@@ -41,12 +43,13 @@ const parseJSON = (str) => {
 }
 
 const parseFormURLEncoded = (str) => {
-    const elements = str.split('&');
-    return elements.reduce((acc, val) => {
-        const [key, value] = val.split('=')
-        acc[key] = decodeURIComponent(value)
-        return acc
-    }, {})
+    return qs.parse(str)
+    // const elements = str.split('&');
+    // return elements.reduce((acc, val) => {
+    //     const [key, value] = val.split('=')
+    //     acc[key] = decodeURIComponent(value)
+    //     return acc
+    // }, {})
 }
 
 const serve = (request, reply) => {
@@ -208,13 +211,13 @@ function createWindow() {
             nodeIntegration: true
         }
     })
-    mainWindow.maximize()
+    // mainWindow.maximize()
 
     // and load the index.html of the app.
     mainWindow.loadURL(baseURL)
 
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -223,6 +226,8 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null
     })
+
+    initSettings(app.getAppPath("userData"))
 }
 
 // This method will be called when Electron has finished

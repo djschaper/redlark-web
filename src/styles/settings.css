@@ -1,0 +1,80 @@
+.setting-field {
+    display: flex;
+    align-items: center;
+}
+
+    .setting-field label {
+        margin-right: 15px;
+    }
+
+.text-field {
+    border: 1px solid #a9a9a9;
+    border-radius: 5px;
+    background-color: transparent;
+    font-size: medium;
+    padding: 5px;
+    padding-left: 10px;
+    flex-grow: 1;
+}
+
+#opensong-folder-container {
+    border-radius: 5px;
+    border: 1px solid #a9a9a9;
+    display: flex;
+    flex-direction: row;
+    align-content: flex-end;
+    align-items: center;
+    background-color: white;
+    min-height: 35px;
+    max-height: 35px;
+    min-width: 400px;
+}
+
+    #opensong-folder-container i {
+        padding: 5px;
+        opacity: 0.5;
+    }
+
+    #opensong-folder-container .button {
+        margin: 0px;
+    }
+
+#opensong-folder {
+    border: none;
+    background-color: transparent;
+    font-size: medium;
+    padding: 5px;
+    padding-left: 10px;
+    flex-grow: 1;
+    height: 100%;
+    color: #555555;
+}
+
+#save-button {
+    border: 1px solid transparent;
+    display: inline-flex;
+    border-radius: 5px;
+    width: fit-content;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+    #save-button i {
+        padding: 10px;
+        font-size: 20px;
+    }
+
+    #save-button input {
+        font-size: medium;
+        padding-left: 0;
+        padding-right: 10px;
+    }
+
+form {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#settings-table {
+    margin-bottom: 20px;
+}

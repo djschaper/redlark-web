@@ -67,6 +67,11 @@ h2 {
         transition-duration: 0s;
     }
 
+    .menu-button input {
+        background-color: transparent;
+        border: 1px solid transparent;
+    }
+
 #nav {
     list-style-type: none;
     transition-duration: 1s;

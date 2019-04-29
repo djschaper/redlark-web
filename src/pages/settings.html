@@ -1,8 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="../styles/settings.css">
 </head>
 <body>
-    Hi! These are the settings...
+    <div id="settings" class="section">
+        <div class="section-content">
+            <h2>Settings</h2>
+            <form action="/settings" method="post">
+                <div id="settings-table" class="object-list">
+                    <div class="setting-field">
+                        <label for="opensong-folder">OpenSong Folder Location</label>
+                        <div id="opensong-folder-container">    
+                            <input class="text-field" type="text" name="opensong-folder" id="opensong-folder" formenctype="text/plain"/>
+                            <label class="button" for="opensong-folder-browser">
+                                <i class="fas fa-folder-open dark-button"></i>
+                            </label>
+                            <input type="file" name="opensong-folder-browser" id="opensong-folder-browser" webkitdirectory files hidden/>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-button" id="save-button">
+                    <i class="fas fa-save"></i>
+                    <input type="submit" value="Save">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../scripts/settings.js"></script>
 </body>
 </html>
