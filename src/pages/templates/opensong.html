@@ -10,6 +10,10 @@
             background-color: white;
         }
 
+            body::-webkit-scrollbar {
+                display: none;
+            }
+
         div.page-content {
             width: calc(100%-16px);
             padding: 8px;
@@ -28,6 +32,16 @@
             -webkit-box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
             -moz-box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
             box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
+        }
+
+        .sticky-controls {
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+
+        .sticky-controls + div {
+            padding-top: 30px;
         }
 
         #key-select {
@@ -133,7 +147,7 @@
     </style>
 </head>
 <body>
-    <div class="controls">
+    <div id="header" class="controls">
         <label>Key</label>
         <select id="key-select"></select>
         <i id="display-mode" class="control-btn far fa-moon"></i>
@@ -216,6 +230,16 @@
             } else {
                 displayMode.className = displayMode.className.replace('fas', 'far')
                 songWrapper.classList.remove('dark-theme')
+            }
+        })
+
+        const header = document.getElementById("header")
+        const stickyOffset = header.offsetTop
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > stickyOffset) {
+                header.classList.add("sticky-controls")
+            } else {
+                header.classList.remove("sticky-controls")
             }
         })
     </script>

@@ -171,25 +171,11 @@
     opacity: 1;
 }
 
-#pdf-window {
+#preview-window {
     height: 100vh;
     width: calc(100% - 10px);
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 0;
     background-color: #d1d1d1;
     border: 1px solid slategray;
     border-radius: 5px;
-}
-
-#file-selector {
-    min-width: 50px;
-    min-height: 30px;
-    max-height: 30px;
-    padding: 2px;
-    margin-bottom: 10px;
-    align-self: flex-start;
-    border-radius: 5px;
-    border-color: #a9a9a9;
-    font-size: medium;
-    color: #555555;
 }

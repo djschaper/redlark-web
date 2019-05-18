@@ -1,5 +1,5 @@
 {
-  "name": "fbc-redlark",
+  "name": "redlark",
   "version": "0.3.2",
   "private": true,
   "main": "src/app.js",

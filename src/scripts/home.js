@@ -23,8 +23,7 @@ const SHEET_MUSIC_DELIMITER = 'sheet'
 const SET_ID_PREFIX = 'SET-ID:'
 
 /// Common objects //////////////////////////////////////////////////////
-const pdfWindow = document.getElementById('pdf-window')
-const fileSelector = document.getElementById('file-selector')
+const previewWindow = document.getElementById('preview-window')
 const setSongList = document.getElementById('set-song-list')
 const songList = document.getElementById('song-list')
 const songSearchbox = document.getElementById('song-searchbox')
@@ -57,31 +56,6 @@ const parseChord = (str) => {
     return null;
 }
 
-const selectSongKey = (preferPreset = false) => {
-    let option = fileSelector.options[fileSelector.selectedIndex]
-
-    // Save key for song in set
-    const songId = fileSelector.getAttribute('data-song-id')
-    if (songId.includes(SET_ID_PREFIX)) {
-        const song = document.getElementById(songId)
-
-        const key = parseChord(song.getElementsByClassName('key')[0].innerText)
-        if (preferPreset && key) {
-            // User has already picked a key for this song in the set, so use that
-            optionIndex = Array.from(fileSelector.options).findIndex(opt => opt.getAttribute('data-key') === key)
-            fileSelector.selectedIndex = optionIndex
-            option = fileSelector.options[optionIndex]
-        } else {
-            // First time we are selecting a key, so pick default and update song
-            song.getElementsByClassName('key')[0].innerText = option.getAttribute('data-key')
-            updateSaveButton(true)
-        }
-    }
-
-    // Update preview window
-    pdfWindow.setAttribute('src', option.value)
-}
-
 const getSets = () => {
     ajax({
         method: 'GET',
@@ -102,7 +76,7 @@ const getSong = (event) => {
         route: `/song?id=${songId}`,
         type: RESPONSE_TYPES.TEXT,
         handler: (html) => {
-            pdfWindow.setAttribute('srcdoc', html)
+            previewWindow.setAttribute('srcdoc', html)
         }
     })
 }
@@ -198,8 +172,6 @@ getSongList()
 // Set up event listeners
 setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
-
-fileSelector.addEventListener('change', (event) => selectSongKey())
 
 const searchSongs = (event) => {
     const search = event.target.value.toLowerCase()
