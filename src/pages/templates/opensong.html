@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <style>
+        /* Page Layout */
+        body {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            margin: 0px;
+            background-color: white;
+        }
+
+        div.page-content {
+            width: calc(100%-16px);
+            padding: 8px;
+        }
+
+        div.controls {
+            width: calc(100%-6px);
+            height: 30px;
+            color: white;
+            background-color: #1d2838;
+            padding: 3px;
+            text-align: left;
+            align-items: center;
+            justify-content: flex-start;
+            display: flex;
+            -webkit-box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
+            -moz-box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
+            box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
+        }
+
+        #key-select {
+            margin-left: 5px;
+        }
+
+        .control-btn {
+            margin-left: 30px;
+        }
+
+        #youtube-link {
+            text-decoration: none;
+            color: #ff0000;
+        }
+
+        div.song-content {
+        }
+
+        div.footer {
+            width: 100%;
+            text-align: center;
+            font-size: x-small;
+            margin-top: 50px;
+        }
+
+        @media print {
+            div.footer {
+                position: fixed;
+                bottom: 0;
+            }
+        }
+
+        @media print {
+            div.controls {
+                display: none;
+            }
+        }
+
+        .dark-theme {
+            background-color: black;
+            color: white;
+        }
+
+        /* Song Metadata */
+        song {
+            font-size: x-large;
+            font-weight: bold;
+        }
+
+        author {
+            font-size: small;
+        }
+
+        tempo {
+            font-size: small;
+        }
+
+        key {
+            font-size: medium;
+            font-weight: bold;
+        }
+
+        table.details {
+            width: 100%;
+        }
+
+        #key-tempo {
+            text-align: right;
+        }
+
+        /* Song Contents */
+        div.section {
+            display: block;
+            margin-top: 30px;
+            break-inside: avoid;
+        }
+
+        .indented {
+            margin-left: 30px;
+        }
+
+        section-title {
+            font-style: italic;
+            font-size: small;
+        }
+
+        span.line {
+            display: block;
+            white-space: pre;
+        }
+
+        span.chord-lyric {
+            display: inline-flex;
+            flex-direction: column;
+        }
+
+        chord {
+            font-weight: bold;
+        }
+
+        lyric {
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label>Key</label>
+        <select id="key-select"></select>
+        <i id="display-mode" class="control-btn far fa-moon"></i>
+        <a id="youtube-link" class="control-btn fab fa-youtube" target="_blank"></a>
+    </div>
+    <div class="song-wrapper">
+        <div class="page-content">
+            <table class="details">
+                <tr>
+                    <td>
+                        <song></song>
+                        <br>
+                        <author></author>
+                    </td>
+                    <td id="key-tempo">
+                        <key></key>
+                        <br>
+                        <tempo></tempo>
+                    </td>
+                </tr>
+            </table>
+            <div class="song-content"></div>
+        </div>
+
+        <div class="footer"></div>
+    </div>
+
+    <script id="shared-functions" type="text/javascript"></script>
+    <script type="text/javascript">
+        // Constants /////////////////////////////////////////////////////////////////////
+        const BASE_CHORDS = [
+            'A',
+            'Bb',
+            'B',
+            'C',
+            'C#',
+            'D',
+            'Eb',
+            'E',
+            'F',
+            'F#',
+            'G',
+            'G#',
+        ]
+        const MAJOR_KEYS = BASE_CHORDS
+        const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
+
+        // Functions ////////////////////////////////////////////////////////////////////
+        function transposeSong(targetKey) {
+            const currentKeyObj = document.getElementsByTagName('key')[0]
+            const change = getTranspositionChange(currentKeyObj.innerText, targetKey)
+
+            // Change all chords in song body
+            const chords = document.getElementsByTagName('chord')
+            for (let i = 0; i < chords.length; i++) {
+                if (!chords[i] || chords[i].innerText.trim() == '') {
+                    continue
+                }
+
+                chords[i].innerText = transposeChord(chords[i].innerText, change)
+            }
+            // Change 'Key' in song overview
+            currentKeyObj.innerText = targetKey
+        }
+
+        // Listeners ///////////////////////////////////////////////////////////////////////
+        const keySelect = document.getElementById('key-select')
+        keySelect.addEventListener('change', (event) => {
+            const targetKey = keySelect[keySelect.selectedIndex].innerText
+            console.log('Change to: ' + targetKey)
+            transposeSong(targetKey)
+        })
+
+        const displayMode = document.getElementById('display-mode')
+        displayMode.addEventListener('click', (event) => {
+            const songWrapper = document.getElementsByTagName('body')[0]
+            if (displayMode.className.includes('far')) {
+                displayMode.className = displayMode.className.replace('far', 'fas')
+                songWrapper.classList.add('dark-theme')
+            } else {
+                displayMode.className = displayMode.className.replace('fas', 'far')
+                songWrapper.classList.remove('dark-theme')
+            }
+        })
+    </script>
+</body>
+</html>

@@ -44,12 +44,6 @@ const parseJSON = (str) => {
 
 const parseFormURLEncoded = (str) => {
     return qs.parse(str)
-    // const elements = str.split('&');
-    // return elements.reduce((acc, val) => {
-    //     const [key, value] = val.split('=')
-    //     acc[key] = decodeURIComponent(value)
-    //     return acc
-    // }, {})
 }
 
 const serve = (request, reply) => {

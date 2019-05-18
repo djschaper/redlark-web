@@ -5,7 +5,7 @@ const cheerio = require('cheerio')
 
 const { applyMainPageTemplate } = require('../lib/html')
 const { AUTH_METHODS } = require('../lib/auth')
-const { get, keys } = require('../lib/settings')
+const settings = require('../lib/settings')
 
 const settingsHTML = fs.readFileSync(path.resolve(__dirname, '../pages/settings.html'))
 
@@ -13,7 +13,9 @@ const handler = (request, reply) => {
     const html = applyMainPageTemplate(settingsHTML)
 
     const $ = cheerio.load(html)
-    keys.forEach(key => $(`#${key}`).attr('value', get(key)))
+
+    console.log(settings.keys)
+    settings.keys.forEach(key => $(`#${key}`).attr('value', settings.get(key)))
 
     reply.writeHead(200)
     reply.write($.html())

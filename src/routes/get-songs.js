@@ -2,44 +2,47 @@ const path = require('path')
 const fs = require('fs')
 const cheerio = require('cheerio')
 
-const gdrive = require('../lib/gdrive')
 const { AUTH_METHODS } = require('../lib/auth')
+const settings = require('../lib/settings')
+const opensong = require('../lib/opensong')
 
 const SONG_HTML_TEMPLATE_PATH = path.resolve(__dirname, '../pages/templates/song.html')
+const SONGS_SUB_FOLDER = "Songs"
 
-const handler = (request, reply) =>
-    gdrive.findFolder('Worship Songs')
-        .then((folder) => {
-            if (!folder) return Promise.resolve([])
-            return gdrive.listFoldersInFolder(folder.id)
-        })
-        .then((folders) => {
-            folders = folders.filter(folder => !folder.name.startsWith('_'))
-            folders.sort((a, b) => {
-                const aName = a.name.toLowerCase()
-                const bName = b.name.toLowerCase()
-                if (aName < bName) return -1
-                else if (aName > bName) return 1
-                else return 0
-            })
+const handler = (request, reply) => {
+    const openSongFolder = path.join(settings.get(settings.dict.OPENSONG_FOLDER), SONGS_SUB_FOLDER)
+    var files = []
+    if (fs.existsSync(openSongFolder)) {
+        files = fs.readdirSync(openSongFolder)
+    } else {
+        console.log(`OpenSong Songs folder "${openSongFolder}" does not exist`)
+    }
+    
+    const openSongFiles = files.filter(file => file.indexOf('.') < 0)
 
-            const songList = cheerio.load('<ul></ul>')('ul')
-            const template = cheerio.load(fs.readFileSync(SONG_HTML_TEMPLATE_PATH))
-            folders.reduce((acc, val) => {
-                const song = template('.song').clone()
-                song.attr('id', val.id)
-                song.find('.song-title').text(val.name)
-                acc.append(song)
-                return acc
-            },
-                songList
-            )
+    const songList = cheerio.load('<ul></ul>')('ul')
+    const template = cheerio.load(fs.readFileSync(SONG_HTML_TEMPLATE_PATH))
+    openSongFiles.reduce((acc, val) => {
+        const id = val.replace(/\W/g, '-').toLowerCase()
 
-            reply.setHeader('content-type', 'text/html')
-            reply.writeHead(200)
-            reply.write(songList.html())
-            return reply.end()
-        })
+        // Save id-filepath relationship for later access
+        opensong.idToPath[id] = path.join(openSongFolder, val)
+
+        // Build HTML element
+        const song = template('.song').clone()
+        song.attr('id', id)
+        song.find('.song-title').text(val)
+        acc.append(song)
+        return acc
+    },
+        songList
+    )
+
+    reply.setHeader('content-type', 'text/html')
+    reply.writeHead(200)
+    reply.write(songList.html())
+    return reply.end()
+}
 
 const route = {
     method: 'GET',

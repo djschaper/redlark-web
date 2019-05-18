@@ -2,9 +2,9 @@ const path = require('path')
 const fs = require('fs')
 
 const SETTINGS_FILENAME = 'user_settings.json'
-const SETTING_KEYS = [
-    'opensong-folder'
-]
+const SETTINGS = {
+    OPENSONG_FOLDER: "opensong-folder"
+}
 
 let settingsFilePath
 let settings
@@ -40,5 +40,6 @@ module.exports = {
     get,
     set,
     setAll,
-    keys: SETTING_KEYS
+    dict: SETTINGS,
+    keys: Object.values(SETTINGS)
 }

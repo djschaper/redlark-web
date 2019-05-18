@@ -94,57 +94,15 @@ const getSets = () => {
     })
 }
 
-const getSongFiles = (event) => {
+const getSong = (event) => {
     const song = event.currentTarget.parentElement
-    const folderId = song.id.split(SET_ID_PREFIX)[0]
+    const songId = song.id.split(SET_ID_PREFIX)[0]
     ajax({
         method: 'GET',
-        route: `/song?folder=${folderId}`,
-        type: RESPONSE_TYPES.JSON,
-        handler: (files) => {
-            // Clear file list
-            fileSelector.innerText = ''
-            fileSelector.setAttribute('data-song-id', song.id)
-
-            // Add new files to list
-            const options = files.map(file => {
-                const option = document.createElement('option')
-                option.setAttribute('value', file.link)
-                const filenameSplit = file.name.replace('.pdf', '').split('-')
-                let key = filenameSplit[filenameSplit.length - 1].trim()
-                const isSheetMusic = key.toLowerCase().includes(SHEET_MUSIC_DELIMITER)
-                if (isSheetMusic) key = key.split(' ')[0].trim()
-
-                let optionText = file.name
-                if (MUSICAL_CHORDS.includes(key)) {
-                    optionText = key
-                    option.setAttribute('data-key', key)
-                    if (isSheetMusic) {
-                        optionText = optionText + ' (Sheet)'
-                    }
-                } else {
-                    option.setAttribute('data-key', '?')
-                }
-
-                option.innerText = optionText
-                return option
-            })
-
-            // Sort keys alphabetically, with unrecognized name formats at bottom
-            options.sort((a, b) => {
-                const aTitle = a.innerText
-                const bTitle = b.innerText
-                if (aTitle.includes('.')) return 1
-                if (bTitle.includes('.')) return -1
-
-                if (aTitle < bTitle) return -1
-                else if (aTitle > bTitle) return 1
-                else return 0
-            })
-            options.forEach(option => fileSelector.appendChild(option))
-
-            // Set PDf preview to first option
-            selectSongKey(true)
+        route: `/song?id=${songId}`,
+        type: RESPONSE_TYPES.TEXT,
+        handler: (html) => {
+            pdfWindow.setAttribute('srcdoc', html)
         }
     })
 }
