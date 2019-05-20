@@ -16,6 +16,7 @@ const DOWNLOAD_ROUTE_BASE = '/download/'
 const handler = (request, reply) => {
     const songId = request.body.id
     const format = request.body.format
+    const key = request.body.key
     
     if (!songId) {
         reply.writeHead(400)
@@ -33,9 +34,13 @@ const handler = (request, reply) => {
         reply.end()
     }
 
-    const tmpFilename = path.basename(opensong.idToPath[songId]) + EXTENSIONS[format]
+    const song = opensong.generateHTML(opensong.idToPath[songId], { targetKey: key })
+    
+    let tmpFilename = path.basename(opensong.idToPath[songId]) + EXTENSIONS[format]
+    if (format === 'pdf') {
+        tmpFilename = path.basename(opensong.idToPath[songId]) + ' - ' + song.key + EXTENSIONS[format]
+    }
     const tmpFilepath = path.join(TMP_FOLDER, tmpFilename)
-    const html = opensong.generateHTML(opensong.idToPath[songId])
 
     const respond = (err) => {
         if (err) {
@@ -65,7 +70,7 @@ const handler = (request, reply) => {
             })
             .then((res) => {
                 page = res
-                return page.setContent(html)
+                return page.setContent(song.html)
             })
             .then(() => page.pdf({
                 path: tmpFilepath,
@@ -80,7 +85,7 @@ const handler = (request, reply) => {
             .then(() => browser.close())
             .then(() => respond())
     } else {
-        fs.writeFileSync(tmpFilepath, html)
+        fs.writeFileSync(tmpFilepath, song.html)
         return respond()
     }
 }

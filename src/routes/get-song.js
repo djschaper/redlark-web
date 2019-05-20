@@ -10,11 +10,11 @@ const handler = (request, reply) => {
         reply.end()
     }
 
-    const html = opensong.generateHTML(opensong.idToPath[songId], { embeddedId: songId })
+    const song = opensong.generateHTML(opensong.idToPath[songId], { embeddedId: songId })
 
     reply.setHeader('content-type', 'text/html')
     reply.writeHead(200)
-    reply.write(html)
+    reply.write(song.html)
     return reply.end()
 }
 

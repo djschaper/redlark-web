@@ -109,12 +109,6 @@ function buildYoutubeSearchURL(searchStrings) {
     return 'https://www.youtube.com/results?search_query=' + searchStrings.map(str => encodeURI(str)).join('+')
 }
 
-function getFooter(openSongFile) {
-    const openSongContents = fs.readFileSync(openSongFile, 'UTF8')
-    const openSongXML = cheerio.load(openSongContents, {xmlMode: true})
-    return openSongXML('copyright').text()
-}
-
 function generateHTML(openSongFile, options = {}) {
     let outputHTMLFile = null
     let targetKey = null
@@ -179,7 +173,8 @@ function generateHTML(openSongFile, options = {}) {
         timeTempoLines.push('Time - ' + openSongXML('time_sig').text())
     }
     $('tempo').text(timeTempoLines.join(' | '))
-    $('.footer').text(openSongXML('copyright').text())
+    const copyright = openSongXML('copyright').text()
+    $('.footer').text(copyright)
 
     if (openSongXML('link_youtube').text() != '') {
         $('#youtube-link').attr('href', openSongXML('link_youtube').text())
@@ -344,18 +339,20 @@ function generateHTML(openSongFile, options = {}) {
         transposeChord.toString()
     ].join('\n\n'))
 
-    if (outputHTMLFile == null) {
-        // Return formatted HTML
-        return $.html()
-    } else {
+    if (outputHTMLFile != null) {
         // Write to output file
-        fs.writeFileSync(outputHTMLFile, $.html())
+        fs.writeFileSync(outputHTMLFile, $.html())   
+    }
+
+    return {
+        html: $.html(),
+        key: targetKey,
+        copyright
     }
     
 }
 
 module.exports = {
-    getFooter,
     generateHTML,
     idToPath
 }

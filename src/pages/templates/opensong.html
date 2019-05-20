@@ -290,7 +290,10 @@
             hiddenDownload.click()
         }
 
+        const keySelector = document.getElementById('key-select')
         const postSongFile = (format, handler) => {
+            const key = keySelector.options[keySelector.selectedIndex].value
+            
             const xhttp = new XMLHttpRequest()
             xhttp.responseType = 'json'
             xhttp.onreadystatechange = () => {
@@ -300,9 +303,10 @@
             }
             xhttp.open('POST', '/song/file', true)
             xhttp.setRequestHeader("content-type", "application/json");
-            xhttp.send(JSON.stringify({ 
+            xhttp.send(JSON.stringify({
                 id: document.getElementsByTagName('meta')['embedded-id'].getAttribute("content"),
-                format
+                format,
+                key
             }))
         }
 
