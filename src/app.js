@@ -19,6 +19,7 @@ const SERVING_FOLDERS = [
     'pages',
     'download'
 ]
+const MODULES_PROXY_FOLDER = 'modules'
 
 console.info = (message) => console.log('[INFO] ' + message)
 
@@ -75,8 +76,13 @@ const serve = (request, reply) => {
 
             // See if the path is a servable file
             const folder = request.path.split('/')[1]
-            if (SERVING_FOLDERS.includes(folder)) {
-                const relativeFilePath = '.' + decodeURIComponent(request.path)
+            if (SERVING_FOLDERS.includes(folder) || folder === MODULES_PROXY_FOLDER) {
+                const decodedPath = decodeURIComponent(request.path)
+                let relativeFilePath = '.' + decodedPath
+                if (folder === MODULES_PROXY_FOLDER) {
+                    relativeFilePath = '../node_modules/' + decodedPath.split('/').slice(2).join('/')
+                }
+                
                 const file = fs.readFileSync(relativeFilePath)
                 const extension = path.extname(relativeFilePath)
                 let contentType = 'text/plain'
@@ -92,6 +98,12 @@ const serve = (request, reply) => {
                         break
                     case '.png', '.gif':
                         contentType = `image/${extension.replace('.', '')}`
+                        break
+                    case '.html':
+                        contentType = 'text/html'
+                        break
+                    case '.pdf':
+                        contentType = 'application/pdf'
                         break
                 }
                 reply.setHeader('content-type', contentType)

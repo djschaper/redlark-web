@@ -1,3 +1,5 @@
+const Sortable = require('sortablejs')
+
 const MAJOR_MUSICAL_CHORDS = [
     'Ab',
     'A',
