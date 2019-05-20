@@ -109,7 +109,27 @@ function buildYoutubeSearchURL(searchStrings) {
     return 'https://www.youtube.com/results?search_query=' + searchStrings.map(str => encodeURI(str)).join('+')
 }
 
-function generateHTML(openSongFile, outputHTMLFile = null, targetKey = null) {
+function getFooter(openSongFile) {
+    const openSongContents = fs.readFileSync(openSongFile, 'UTF8')
+    const openSongXML = cheerio.load(openSongContents, {xmlMode: true})
+    return openSongXML('copyright').text()
+}
+
+function generateHTML(openSongFile, options = {}) {
+    let outputHTMLFile = null
+    let targetKey = null
+    let embeddedId = null
+
+    if ('outputHTMLFile' in options) {
+        outputHTMLFile = options.outputHTMLFile
+    }
+    if ('targetKey' in options) {
+        targetKey = options.targetKey
+    }
+    if ('embeddedId' in options) {
+        embeddedId = options.embeddedId
+    }
+
     // Read OpenSong file
     const openSongContents = fs.readFileSync(openSongFile, 'UTF8')
     const openSongXML = cheerio.load(openSongContents, {xmlMode: true})
@@ -123,7 +143,6 @@ function generateHTML(openSongFile, outputHTMLFile = null, targetKey = null) {
         targetKey = key
     }
     const transposeChange = getTranspositionChange(key, targetKey)
-    //console.log('Transpose Change: +' + transposeChange)
 
     // Set up transposition control
     let transposeOptions
@@ -139,6 +158,14 @@ function generateHTML(openSongFile, outputHTMLFile = null, targetKey = null) {
             $('#key-select').append('<option value="' + key + '">' + key + '</option>')
         }
     })
+
+    // Disable unsupported elements if not embedded
+    if (embeddedId === null) {
+        $('#save-pdf').css('display', 'none')
+        $('#export').css('display', 'none')
+    } else {
+        $("meta[name='embedded-id']").attr('content', embeddedId)
+    }
 
     // Populate song details
     $('song').text(openSongXML('title').text())
@@ -328,6 +355,7 @@ function generateHTML(openSongFile, outputHTMLFile = null, targetKey = null) {
 }
 
 module.exports = {
+    getFooter,
     generateHTML,
     idToPath
 }

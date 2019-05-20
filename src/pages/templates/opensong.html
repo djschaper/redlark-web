@@ -2,6 +2,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <meta name="embedded-id" content="">
     <style>
         /* Page Layout */
         body {
@@ -20,14 +21,16 @@
         }
 
         div.controls {
-            width: calc(100%-6px);
+            width: calc(100%-20px);
             height: 30px;
             color: white;
-            background-color: #1d2838;
-            padding: 3px;
+            background-color: #2589bd;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
             text-align: left;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: space-between;
             display: flex;
             -webkit-box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
             -moz-box-shadow: -5px 0px 10px 10px rgba(0,0,0,0.05);
@@ -36,25 +39,48 @@
 
         .sticky-controls {
             position: fixed;
-            width: 100%;
             top: 0;
         }
 
         .sticky-controls + div {
-            padding-top: 30px;
+            padding-top: 40px;
         }
 
         #key-select {
-            margin-left: 5px;
+            margin-left: 7px;
+            margin-right: 50px;
+            border: grey;
+            border-radius: 2px;
+            color: white;
+            font-size: medium;
+            background-color: #33a6e4;
+            outline: none;
+            outline-color: #1f74a1;
+        }
+
+            #key-select:hover, #key-select:active {
+                cursor: pointer;
+                box-shadow: 0 0 3px 4px rgba(0,0,0,.2);
+                transition-duration: 0.2s;
+            }
+
+        option:hover, option:active, option:focus {
+            cursor:pointer;
         }
 
         .control-btn {
-            margin-left: 30px;
+            margin-left: 15px;
+            color: white;
         }
+            
+            .control-btn:hover {
+                color: rgba(0,0,0,0.5);
+                transition-duration: 0.2s;
+                cursor: pointer;
+            }
 
         #youtube-link {
             text-decoration: none;
-            color: #ff0000;
         }
 
         div.song-content {
@@ -148,10 +174,17 @@
 </head>
 <body>
     <div id="header" class="controls">
-        <label>Key</label>
-        <select id="key-select"></select>
-        <i id="display-mode" class="control-btn far fa-moon"></i>
-        <a id="youtube-link" class="control-btn fab fa-youtube" target="_blank"></a>
+        <div>
+            <label>Key</label>
+            <select id="key-select"></select>
+        </div>
+        <div>
+            <i id="display-mode" class="control-btn far fa-moon"></i>
+            <a id="youtube-link" class="control-btn fab fa-youtube" target="_blank"></a>
+            <i id="print" class="control-btn fas fa-print"></i>
+            <i id="save-pdf" class="control-btn fas fa-file-pdf"></i>
+            <i id="export" class="control-btn fas fa-file-export"></i>
+        </div>
     </div>
     <div class="song-wrapper">
         <div class="page-content">
@@ -210,10 +243,23 @@
                 chords[i].innerText = transposeChord(chords[i].innerText, change)
             }
             // Change 'Key' in song overview
-            currentKeyObj.innerText = targetKey
+            currentKeyObj.innerText = "Key - " + targetKey
         }
 
         // Listeners ///////////////////////////////////////////////////////////////////////
+        const header = document.getElementById("header")
+        const stickyOffset = header.offsetTop
+        const setHeaderWidth = () => header.style.width = `${header.parentElement.clientWidth - 20}px`
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > stickyOffset) {
+                header.classList.add('sticky-controls')
+            } else {
+                header.classList.remove('sticky-controls')
+            }
+            setHeaderWidth()
+        })
+        window.addEventListener('resize', setHeaderWidth)
+
         const keySelect = document.getElementById('key-select')
         keySelect.addEventListener('change', (event) => {
             const targetKey = keySelect[keySelect.selectedIndex].innerText
@@ -233,15 +279,38 @@
             }
         })
 
-        const header = document.getElementById("header")
-        const stickyOffset = header.offsetTop
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > stickyOffset) {
-                header.classList.add("sticky-controls")
-            } else {
-                header.classList.remove("sticky-controls")
+        document.getElementById('print').addEventListener('click', (event) => window.print())
+
+        const downloadLink = (link, extension) => {
+            const suggestedFilename = document.getElementsByTagName('song')[0].innerText + extension
+            
+            const hiddenDownload = document.createElement('a')
+            hiddenDownload.href = link
+            hiddenDownload.download = suggestedFilename
+            hiddenDownload.click()
+        }
+
+        const postSongFile = (format, handler) => {
+            const xhttp = new XMLHttpRequest()
+            xhttp.responseType = 'json'
+            xhttp.onreadystatechange = () => {
+                if (xhttp.readyState === 4 && xhttp.status === 200) {
+                    handler(xhttp.response)
+                }
             }
-        })
+            xhttp.open('POST', '/song/file', true)
+            xhttp.setRequestHeader("content-type", "application/json");
+            xhttp.send(JSON.stringify({ 
+                id: document.getElementsByTagName('meta')['embedded-id'].getAttribute("content"),
+                format
+            }))
+        }
+
+        const saveHTMLPage = () => postSongFile('html', (res) => downloadLink(res.download, '.html'))
+        document.getElementById('export').addEventListener('click', saveHTMLPage)
+
+        const savePDF = () => postSongFile('pdf', (res) => downloadLink(res.download, '.pdf'))
+        document.getElementById('save-pdf').addEventListener('click', savePDF)
     </script>
 </body>
 </html>

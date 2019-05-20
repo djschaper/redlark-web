@@ -10,13 +10,14 @@ const glob = require('glob')
 const AWS = require('aws-sdk')
 
 const { authorizeRoute } = require('./lib/auth')
-const { init: initSettings } = require('./lib/settings')
+const settings = require('./lib/settings')
 
 const SERVING_FOLDERS = [
     'styles',
     'assets',
     'scripts',
-    'pages'
+    'pages',
+    'download'
 ]
 
 console.info = (message) => console.log('[INFO] ' + message)
@@ -36,8 +37,10 @@ const registerAllRoutes = () => {
 
 const parseJSON = (str) => {
     try {
-        return JSON.parse(request.body)
+        return JSON.parse(str)
     } catch (err) {
+        console.log('Error parsing JSON body')
+        console.log(err)
         return {}
     }
 }
@@ -73,7 +76,7 @@ const serve = (request, reply) => {
             // See if the path is a servable file
             const folder = request.path.split('/')[1]
             if (SERVING_FOLDERS.includes(folder)) {
-                const relativeFilePath = '.' + request.path
+                const relativeFilePath = '.' + decodeURIComponent(request.path)
                 const file = fs.readFileSync(relativeFilePath)
                 const extension = path.extname(relativeFilePath)
                 let contentType = 'text/plain'
@@ -118,9 +121,9 @@ const serve = (request, reply) => {
                 }
 
                 // Pre-process request data
-                if (request.headers['content-type'] === 'application/json') {
+                if (request.headers['content-type'] && request.headers['content-type'].includes('application/json')) {
                     request.body = parseJSON(request.body)
-                } else if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
+                } else if (request.headers['content-type'] && request.headers['content-type'].includes('application/x-www-form-urlencoded')) {
                     request.body = parseFormURLEncoded(request.body)
                 }
 
@@ -221,7 +224,7 @@ function createWindow() {
         mainWindow = null
     })
 
-    initSettings(app.getAppPath("userData"))
+    settings.init(app.getPath('userData'))
 }
 
 // This method will be called when Electron has finished

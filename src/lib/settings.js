@@ -9,8 +9,8 @@ const SETTINGS = {
 let settingsFilePath
 let settings
 
-const init = (appDataPath) => {
-    settingsFilePath = path.join(appDataPath, SETTINGS_FILENAME)
+const init = (appPath) => {
+    settingsFilePath = path.join(appPath, SETTINGS_FILENAME)
     console.log(`Settings File: ${settingsFilePath}`)
 }
 

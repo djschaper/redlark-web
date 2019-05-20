@@ -10,7 +10,7 @@ const handler = (request, reply) => {
         reply.end()
     }
 
-    const html = opensong.generateHTML(opensong.idToPath[songId])
+    const html = opensong.generateHTML(opensong.idToPath[songId], { embeddedId: songId })
 
     reply.setHeader('content-type', 'text/html')
     reply.writeHead(200)
