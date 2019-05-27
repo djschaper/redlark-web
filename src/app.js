@@ -8,6 +8,7 @@ const qs = require('querystring')
 
 const glob = require('glob')
 const AWS = require('aws-sdk')
+const { autoUpdater } = require("electron-updater")
 
 const { authorizeRoute } = require('./lib/auth')
 const settings = require('./lib/settings')
@@ -203,6 +204,9 @@ createServer()
     .then(() => startServer())
 
 ///// Electron Desktop App /////////////////////////////////////////
+// First check for app updates
+autoUpdater.checkForUpdatesAndNotify()
+
 const { app, BrowserWindow } = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will

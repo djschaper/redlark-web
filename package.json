@@ -5,6 +5,10 @@
   "main": "src/app.js",
   "author": "Derek Schaper",
   "description": "A tool for worship set planning.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/djschaper/redlark-web.git"
+  },
   "scripts": {
     "start": "electron .",
     "start:dev": "nodemon --watch * --ext js,html,css --exec \"electron .\"",
@@ -15,6 +19,7 @@
     "aws-sdk": "^2.270.1",
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^6.0.0",
+    "electron-updater": "^4.0.6",
     "glob": "^7.1.2",
     "googleapis": "^32.0.0",
     "mysql2": "^1.5.3",
@@ -47,7 +52,10 @@
       "target": "dmg"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "publish": [
+        "github"
+      ]
     }
   }
 }
