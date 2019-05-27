@@ -6,4 +6,4 @@ meh
 credentials.json
 certs
 test-certs
-dist/*-unpacked
+dist
