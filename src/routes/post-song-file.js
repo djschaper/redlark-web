@@ -5,13 +5,21 @@ const fs = require('fs')
 
 const { AUTH_METHODS } = require('../lib/auth')
 const opensong = require('../lib/opensong')
+const settings = require('../lib/settings')
 
 const EXTENSIONS = {
     pdf: ".pdf",
     html: ".html"
 }
-const TMP_FOLDER = path.resolve(__dirname, '../download')
 const DOWNLOAD_ROUTE_BASE = '/download/'
+
+// To workaround Puppeteer needing to be unpacked and resolving its path properly when distributed
+const createBrowser = (options = {}) => {
+    return puppeteer.launch({
+        ...options,
+        executablePath: puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked')
+    });
+}
 
 const handler = (request, reply) => {
     const songId = request.body.id
@@ -40,7 +48,7 @@ const handler = (request, reply) => {
     if (format === 'pdf') {
         tmpFilename = path.basename(opensong.idToPath[songId]) + ' - ' + song.key + EXTENSIONS[format]
     }
-    const tmpFilepath = path.join(TMP_FOLDER, tmpFilename)
+    const tmpFilepath = path.join(settings.getPath('temp'), tmpFilename)
 
     const respond = (err) => {
         if (err) {
@@ -63,7 +71,7 @@ const handler = (request, reply) => {
     if (format === 'pdf') {
         let browser
         let page
-        return puppeteer.launch()
+        return createBrowser()
             .then((res) => {
                 browser = res
                 return browser.newPage()

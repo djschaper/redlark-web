@@ -11,28 +11,27 @@ const AWS = require('aws-sdk')
 
 const { authorizeRoute } = require('./lib/auth')
 const settings = require('./lib/settings')
+const version = require('../package.json').version
 
 const SERVING_FOLDERS = [
     'styles',
     'assets',
     'scripts',
-    'pages',
-    'download'
+    'pages'
 ]
-const MODULES_PROXY_FOLDER = 'modules'
+const PROXY_SERVING_FOLDERS = {
+    modules: path.join(__dirname, '../node_modules'),
+    download: null
+}
 
 console.info = (message) => console.log('[INFO] ' + message)
-
-console.info("Changing CWD from: " + process.cwd())
-process.chdir(__dirname)
-console.info("To: " + process.cwd())
 
 const S3 = new AWS.S3()
 
 const registeredRoutes = []
 const registerAllRoutes = () => {
     const registerRoute = (route) => registeredRoutes.push(route)
-    const routeFiles = glob.sync('./routes/**/*.js')
+    const routeFiles = glob.sync(path.join(__dirname, 'routes/**/*.js'))
     routeFiles.forEach(file => registerRoute(require(file).route))
 }
 
@@ -76,11 +75,11 @@ const serve = (request, reply) => {
 
             // See if the path is a servable file
             const folder = request.path.split('/')[1]
-            if (SERVING_FOLDERS.includes(folder) || folder === MODULES_PROXY_FOLDER) {
+            if (SERVING_FOLDERS.includes(folder) || folder in PROXY_SERVING_FOLDERS) {
                 const decodedPath = decodeURIComponent(request.path)
-                let relativeFilePath = '.' + decodedPath
-                if (folder === MODULES_PROXY_FOLDER) {
-                    relativeFilePath = '../node_modules/' + decodedPath.split('/').slice(2).join('/')
+                let relativeFilePath = path.join(__dirname, decodedPath)
+                if (folder in PROXY_SERVING_FOLDERS) {
+                    relativeFilePath = path.join(PROXY_SERVING_FOLDERS[folder], ...decodedPath.split('/').slice(2))
                 }
                 
                 const file = fs.readFileSync(relativeFilePath)
@@ -114,7 +113,11 @@ const serve = (request, reply) => {
             // 404 - Not Found
             console.log('Route not found.')
             reply.writeHead(404)
-            reply.write('<body>Route not found. Thanks for coming out.</body>')
+            reply.write(`<body><p>Route not found. Thanks for coming out.</p>
+                        <p>${request.method} ${request.url} (path: ${request.path})</p>
+                        <p>Available routes: ${registeredRoutes.map((route) => route.path)}</p>
+                        </body>
+            `)
             return reply.end()
         }
 
@@ -218,7 +221,8 @@ function createWindow() {
         autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true
-        }
+        },
+        title: `Redlark ${version}`
     })
     // mainWindow.maximize()
 
@@ -236,7 +240,14 @@ function createWindow() {
         mainWindow = null
     })
 
-    settings.init(app.getPath('userData'))
+    settings.init({
+        appData: app.getPath('appData'),
+        userData: app.getPath('userData'),
+        temp: app.getPath('temp'),
+        logs: app.getPath('logs')
+    })
+
+    PROXY_SERVING_FOLDERS.download = app.getPath('temp')
 }
 
 // This method will be called when Electron has finished

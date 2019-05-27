@@ -6,11 +6,13 @@ const SETTINGS = {
     OPENSONG_FOLDER: "opensong-folder"
 }
 
+let appPaths
 let settingsFilePath
 let settings
 
-const init = (appPath) => {
-    settingsFilePath = path.join(appPath, SETTINGS_FILENAME)
+const init = (paths) => {
+    appPaths = paths
+    settingsFilePath = path.join(appPaths['userData'], SETTINGS_FILENAME)
     console.log(`Settings File: ${settingsFilePath}`)
 }
 
@@ -35,11 +37,16 @@ const setAll = (json) => {
     fs.writeFileSync(settingsFilePath, JSON.stringify(settings))
 }
 
+const getPath = (pathKey) => {
+    return appPaths[pathKey]
+}
+
 module.exports = {
     init,
     get,
     set,
     setAll,
     dict: SETTINGS,
-    keys: Object.values(SETTINGS)
+    keys: Object.values(SETTINGS),
+    getPath
 }

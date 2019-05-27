@@ -288,17 +288,22 @@
             hiddenDownload.href = link
             hiddenDownload.download = suggestedFilename
             hiddenDownload.click()
+            
+            document.body.style.cursor = 'auto'
         }
 
         const keySelector = document.getElementById('key-select')
         const postSongFile = (format, handler) => {
             const key = keySelector.options[keySelector.selectedIndex].value
+            document.body.style.cursor = 'wait'
             
             const xhttp = new XMLHttpRequest()
             xhttp.responseType = 'json'
             xhttp.onreadystatechange = () => {
                 if (xhttp.readyState === 4 && xhttp.status === 200) {
                     handler(xhttp.response)
+                } else {
+                    document.body.style.cursor = 'auto'
                 }
             }
             xhttp.open('POST', '/song/file', true)

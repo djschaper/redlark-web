@@ -1,6 +1,7 @@
 const uuid = require('uuid')
 
-const db = require('../sequelize/models')
+// const db = require('../sequelize/models')
+const db = null //  TEMP - until databases are used again
 const server = require('./server')
 
 const SESSION_UUID_COOKIE_KEY = 'sessionUUID'

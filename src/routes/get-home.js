@@ -3,7 +3,6 @@ const path = require('path')
 const cheerio = require('cheerio')
 
 const { AUTH_METHODS, AUTH_TYPES, getFailedLoginFlag } = require('../lib/auth')
-const gdrive = require('../lib/gdrive')
 const { applyMainPageTemplate } = require('../lib/html')
 
 const loginHTML = fs.readFileSync(path.resolve(__dirname, '../pages/login.html'))
