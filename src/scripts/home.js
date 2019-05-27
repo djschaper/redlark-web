@@ -1,3 +1,5 @@
+const Sortable = require('sortablejs')
+
 const MAJOR_MUSICAL_CHORDS = [
     'Ab',
     'A',
@@ -21,15 +23,9 @@ const MINOR_MUSICAL_CHORDS = MAJOR_MUSICAL_CHORDS.map(key => key + 'm')
 const MUSICAL_CHORDS = [...MAJOR_MUSICAL_CHORDS, ...MINOR_MUSICAL_CHORDS]
 const SHEET_MUSIC_DELIMITER = 'sheet'
 const SET_ID_PREFIX = 'SET-ID:'
-const RESPONSE_TYPES = {
-    XML: 'document',
-    JSON: 'json',
-    TEXT: 'text'
-}
 
-// Common objects
-const pdfWindow = document.getElementById('pdf-window')
-const fileSelector = document.getElementById('file-selector')
+/// Common objects //////////////////////////////////////////////////////
+const previewWindow = document.getElementById('preview-window')
 const setSongList = document.getElementById('set-song-list')
 const songList = document.getElementById('song-list')
 const songSearchbox = document.getElementById('song-searchbox')
@@ -40,23 +36,7 @@ const setList = document.getElementById('set-list')
 
 let allSongs = []
 
-// Functions
-const ajax = (params) => {
-    if (!params.method) params.method = 'GET'
-    if (!params.type) params.type = RESPONSE_TYPES.JSON
-    if (!params.handler) params.handler = (res) => { }
-
-    const xhttp = new XMLHttpRequest()
-    xhttp.responseType = params.type
-    xhttp.onreadystatechange = () => {
-        if (xhttp.readyState === 4 && xhttp.status === 200) {
-            params.handler(xhttp.response)
-        }
-    }
-    xhttp.open(params.method, params.route, true)
-    xhttp.send(params.body)
-}
-
+/// Functions ///////////////////////////////////////////////////////////
 const getSongList = () => {
     ajax({
         method: 'GET',
@@ -78,31 +58,6 @@ const parseChord = (str) => {
     return null;
 }
 
-const selectSongKey = (preferPreset = false) => {
-    let option = fileSelector.options[fileSelector.selectedIndex]
-
-    // Save key for song in set
-    const songId = fileSelector.getAttribute('data-song-id')
-    if (songId.includes(SET_ID_PREFIX)) {
-        const song = document.getElementById(songId)
-
-        const key = parseChord(song.getElementsByClassName('key')[0].innerText)
-        if (preferPreset && key) {
-            // User has already picked a key for this song in the set, so use that
-            optionIndex = Array.from(fileSelector.options).findIndex(opt => opt.getAttribute('data-key') === key)
-            fileSelector.selectedIndex = optionIndex
-            option = fileSelector.options[optionIndex]
-        } else {
-            // First time we are selecting a key, so pick default and update song
-            song.getElementsByClassName('key')[0].innerText = option.getAttribute('data-key')
-            updateSaveButton(true)
-        }
-    }
-
-    // Update preview window
-    pdfWindow.setAttribute('src', option.value)
-}
-
 const getSets = () => {
     ajax({
         method: 'GET',
@@ -115,60 +70,20 @@ const getSets = () => {
     })
 }
 
-const getSongFiles = (event) => {
+const getSong = (event) => {
     const song = event.currentTarget.parentElement
-    const folderId = song.id.split(SET_ID_PREFIX)[0]
+    const songId = song.id.split(SET_ID_PREFIX)[0]
     ajax({
         method: 'GET',
-        route: `/song?folder=${folderId}`,
-        type: RESPONSE_TYPES.JSON,
-        handler: (files) => {
-            // Clear file list
-            fileSelector.innerText = ''
-            fileSelector.setAttribute('data-song-id', song.id)
-
-            // Add new files to list
-            const options = files.map(file => {
-                const option = document.createElement('option')
-                option.setAttribute('value', file.link)
-                const filenameSplit = file.name.replace('.pdf', '').split('-')
-                let key = filenameSplit[filenameSplit.length - 1].trim()
-                const isSheetMusic = key.toLowerCase().includes(SHEET_MUSIC_DELIMITER)
-                if (isSheetMusic) key = key.split(' ')[0].trim()
-
-                let optionText = file.name
-                if (MUSICAL_CHORDS.includes(key)) {
-                    optionText = key
-                    option.setAttribute('data-key', key)
-                    if (isSheetMusic) {
-                        optionText = optionText + ' (Sheet)'
-                    }
-                } else {
-                    option.setAttribute('data-key', '?')
-                }
-
-                option.innerText = optionText
-                return option
-            })
-
-            // Sort keys alphabetically, with unrecognized name formats at bottom
-            options.sort((a, b) => {
-                const aTitle = a.innerText
-                const bTitle = b.innerText
-                if (aTitle.includes('.')) return 1
-                if (bTitle.includes('.')) return -1
-
-                if (aTitle < bTitle) return -1
-                else if (aTitle > bTitle) return 1
-                else return 0
-            })
-            options.forEach(option => fileSelector.appendChild(option))
-
-            // Set PDf preview to first option
-            selectSongKey(true)
+        route: `/song?id=${songId}`,
+        type: RESPONSE_TYPES.TEXT,
+        handler: (html) => {
+            previewWindow.setAttribute('srcdoc', html)
         }
     })
 }
+
+/// Main ////////////////////////////////////////////////////////////////
 
 // Handle drag and drop
 let dragged = null
@@ -259,8 +174,6 @@ getSongList()
 // Set up event listeners
 setSongList.addEventListener('drop', addToSet)
 setSongList.addEventListener('dragover', allowDrop)
-
-fileSelector.addEventListener('change', (event) => selectSongKey())
 
 const searchSongs = (event) => {
     const search = event.target.value.toLowerCase()

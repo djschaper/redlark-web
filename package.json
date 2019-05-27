@@ -1,34 +1,34 @@
 {
-  "name": "fbc-redlark",
-  "version": "0.3.2",
+  "name": "redlark",
+  "version": "0.4.0",
   "private": true,
   "main": "src/app.js",
+  "author": "Derek Schaper",
+  "description": "A tool for worship set planning.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/djschaper/redlark-web.git"
+  },
   "scripts": {
-    "build": "node -e \"require('./bin/deploy.js').build()\"",
-    "build:deploy": "node -e \"require('./bin/deploy.js').buildAndDeploy()\"",
-    "db:migrate": "sequelize db:migrate",
-    "db:migrate:undo": "sequelize db:migrate:undo",
-    "db:seed": "sequelize db:seed:all",
-    "db:seed:undo": "sequelize db:seed:undo --seed",
-    "deploy": "node -e \"require('./bin/deploy.js').deploy()\"",
-    "generate:password": "node -e \"console.log(require('password-hash').generate(process.argv[1]))\"",
-    "meh": "cd meh && nodemon meh.js",
-    "migration:create": "sequelize migration:create --name",
-    "seed:create": "sequelize seed:create --name",
     "start": "electron .",
-    "start:dev": "cd src && nodemon app.js -e js,mjs,json,html"
+    "start:dev": "nodemon --watch * --ext js,html,css --exec \"electron .\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win"
   },
   "dependencies": {
     "aws-sdk": "^2.270.1",
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^6.0.0",
+    "electron-updater": "^4.0.6",
     "glob": "^7.1.2",
     "googleapis": "^32.0.0",
     "mysql2": "^1.5.3",
     "opn": "^5.4.0",
     "password-hash": "^1.2.2",
+    "puppeteer": "^1.16.0",
     "sequelize": "^4.38.0",
     "sequelize-cli": "^4.0.0",
+    "sortablejs": "^1.9.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -36,16 +36,26 @@
     "bluebird": "^3.5.1",
     "dropbox": "^4.0.7",
     "electron": "^4.1.4",
+    "electron-builder": "^20.40.2",
     "fs-extra": "^6.0.1",
     "isomorphic-fetch": "^2.2.1",
-    "nodemon": "^1.17.5",
+    "nodemon": "^1.18.11",
     "prompt-promise": "^1.0.3"
   },
-  "beanstalkPackage": [
-    "src/",
-    "db/",
-    "package.json",
-    ".ebextensions",
-    ".sequelizerc"
-  ]
+  "build": {
+    "appId": "com.schaper.redlark",
+    "productName": "Redlark",
+    "files": [
+      "src/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "publish": [
+        "github"
+      ]
+    }
+  }
 }

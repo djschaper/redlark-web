@@ -3,13 +3,13 @@ const path = require('path')
 const cheerio = require('cheerio')
 
 const { AUTH_METHODS, AUTH_TYPES, getFailedLoginFlag } = require('../lib/auth')
-const gdrive = require('../lib/gdrive')
+const { applyMainPageTemplate } = require('../lib/html')
 
 const loginHTML = fs.readFileSync(path.resolve(__dirname, '../pages/login.html'))
-const mainHTML = fs.readFileSync(path.resolve(__dirname, '../pages/home.html'))
+const homeHTML = fs.readFileSync(path.resolve(__dirname, '../pages/home.html'))
 
 const handler = (request, reply) => {
-    let html = mainHTML
+    let html = applyMainPageTemplate(homeHTML)
 
     // DEBUG - Remove login temporarily
     //if (!request.auth[AUTH_TYPES.MEMBER].authorized) {
