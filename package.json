@@ -1,6 +1,6 @@
 {
   "name": "redlark",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "main": "src/app.js",
   "author": "Derek Schaper",
@@ -13,7 +13,8 @@
     "start": "electron .",
     "start:dev": "nodemon --watch * --ext js,html,css --exec \"electron .\"",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win"
+    "dist": "electron-builder --win",
+    "release": "build"
   },
   "dependencies": {
     "aws-sdk": "^2.270.1",

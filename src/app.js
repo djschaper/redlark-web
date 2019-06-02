@@ -200,13 +200,7 @@ const startServer = () => {
     registerAllRoutes()
 }
 
-createServer()
-    .then(() => startServer())
-
 ///// Electron Desktop App /////////////////////////////////////////
-// First check for app updates
-autoUpdater.checkForUpdatesAndNotify()
-
 const { app, BrowserWindow } = require('electron')
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -271,3 +265,11 @@ app.on('activate', function () {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createWindow()
 })
+
+return createServer()
+    .then(() => {
+        startServer()
+
+        // Check for app updates
+        return  autoUpdater.checkForUpdatesAndNotify()
+    })
