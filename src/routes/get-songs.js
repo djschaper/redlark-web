@@ -23,7 +23,7 @@ const handler = (request, reply) => {
     const songList = cheerio.load('<ul></ul>')('ul')
     const template = cheerio.load(fs.readFileSync(SONG_HTML_TEMPLATE_PATH))
     openSongFiles.reduce((acc, val) => {
-        const id = val.replace(/\W/g, '-').toLowerCase()
+        const id = 'id_' + val.replace(/\W/g, '-').toLowerCase()
 
         // Save id-filepath relationship for later access
         opensong.idToPath[id] = path.join(openSongFolder, val)

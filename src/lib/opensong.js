@@ -113,6 +113,7 @@ function generateHTML(openSongFile, options = {}) {
     let outputHTMLFile = null
     let targetKey = null
     let embeddedId = null
+    let embeddedFullId = null
 
     if ('outputHTMLFile' in options) {
         outputHTMLFile = options.outputHTMLFile
@@ -122,6 +123,9 @@ function generateHTML(openSongFile, options = {}) {
     }
     if ('embeddedId' in options) {
         embeddedId = options.embeddedId
+    }
+    if ('embeddedFullId' in options) {
+        embeddedFullId = options.embeddedFullId
     }
 
     // Read OpenSong file
@@ -154,11 +158,16 @@ function generateHTML(openSongFile, options = {}) {
     })
 
     // Disable unsupported elements if not embedded
-    if (embeddedId === null) {
+    if (embeddedId == null) {
         $('#save-pdf').css('display', 'none')
         $('#export').css('display', 'none')
     } else {
         $("meta[name='embedded-id']").attr('content', embeddedId)
+    }
+
+    // Save song's set id if embedded
+    if (embeddedFullId != null) {
+        $("meta[name='embedded-full-id']").attr('content', embeddedFullId)
     }
 
     // Populate song details
