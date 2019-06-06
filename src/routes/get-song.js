@@ -3,6 +3,9 @@ const opensong = require('../lib/opensong')
 
 const handler = (request, reply) => {
     const songId = request.query.id
+    const fullId = request.query.fullid
+    let targetKey = request.query.key
+    
     
     if (!songId) {
         reply.writeHead(400)
@@ -10,7 +13,15 @@ const handler = (request, reply) => {
         reply.end()
     }
 
-    const song = opensong.generateHTML(opensong.idToPath[songId], { embeddedId: songId })
+    const options = { embeddedId: songId }
+    if (!!fullId) {
+        options.embeddedFullId = fullId
+    }
+    if (!!targetKey) {
+        options.targetKey = decodeURIComponent(targetKey)
+    }
+
+    const song = opensong.generateHTML(opensong.idToPath[songId], options)
 
     reply.setHeader('content-type', 'text/html')
     reply.writeHead(200)

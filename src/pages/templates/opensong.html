@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <meta name="embedded-id" content="">
+    <meta name="embedded-full-id" content="">
     <style>
         /* Page Layout */
         body {
@@ -247,6 +248,9 @@
         }
 
         // Listeners ///////////////////////////////////////////////////////////////////////
+        const songId = document.getElementsByTagName('meta')['embedded-id'].getAttribute("content")
+        const songFullId = document.getElementsByTagName('meta')['embedded-full-id'].getAttribute("content")
+
         const header = document.getElementById("header")
         const stickyOffset = header.offsetTop
         const setHeaderWidth = () => header.style.width = `${header.parentElement.clientWidth - 20}px`
@@ -265,6 +269,10 @@
             const targetKey = keySelect[keySelect.selectedIndex].innerText
             console.log('Change to: ' + targetKey)
             transposeSong(targetKey)
+
+            if (songFullId !== '') {
+                parent.document.querySelector(`#${songFullId} .key`).innerText = targetKey
+            }
         })
 
         const displayMode = document.getElementById('display-mode')
@@ -309,7 +317,7 @@
             xhttp.open('POST', '/song/file', true)
             xhttp.setRequestHeader("content-type", "application/json");
             xhttp.send(JSON.stringify({
-                id: document.getElementsByTagName('meta')['embedded-id'].getAttribute("content"),
+                id: songId,
                 format,
                 key
             }))

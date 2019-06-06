@@ -22,7 +22,7 @@ const MAJOR_MUSICAL_CHORDS = [
 const MINOR_MUSICAL_CHORDS = MAJOR_MUSICAL_CHORDS.map(key => key + 'm')
 const MUSICAL_CHORDS = [...MAJOR_MUSICAL_CHORDS, ...MINOR_MUSICAL_CHORDS]
 const SHEET_MUSIC_DELIMITER = 'sheet'
-const SET_ID_PREFIX = 'SET-ID:'
+const SET_ID_PREFIX = '_SET-ID-'
 
 /// Common objects //////////////////////////////////////////////////////
 const previewWindow = document.getElementById('preview-window')
@@ -72,18 +72,33 @@ const getSets = () => {
 
 const getSong = (event) => {
     const song = event.currentTarget.parentElement
+    const songIdSplit = song.id.split(SET_ID_PREFIX)
     const songId = song.id.split(SET_ID_PREFIX)[0]
+    const key = song.querySelector('.key')
+    
+    let queryString = `id=${songId}`
+    if (songIdSplit.length > 1) {
+        queryString += `&fullid=${song.id}`
+    }
+    const isKeySet = parseChord(key.innerText) != null
+    if (isKeySet) {
+        queryString += `&key=${encodeURIComponent(key.innerText)}`
+    }
+
     ajax({
         method: 'GET',
-        route: `/song?id=${songId}`,
+        route: `/song?${queryString}`,
         type: RESPONSE_TYPES.TEXT,
         handler: (html) => {
             previewWindow.setAttribute('srcdoc', html)
+            if (!isKeySet) {
+                // Song doesn't have a user-associated key yet - use song's default
+                const openSongHTML = new DOMParser().parseFromString(html, 'text/html')
+                key.innerText = openSongHTML.querySelector('key').innerText.split('-')[1].trim()
+            }
         }
     })
 }
-
-/// Main ////////////////////////////////////////////////////////////////
 
 // Handle drag and drop
 let dragged = null
@@ -167,6 +182,8 @@ const resetTextForElement = (elem) => {
     elem.style.transitionDuration = '0s'
     elem.style.left = '0'
 }
+
+/// Main ////////////////////////////////////////////////////////////////
 
 // Initialize song list
 getSongList()
