@@ -12,7 +12,7 @@ const { autoUpdater } = require("electron-updater")
 
 const { authorizeRoute } = require('./lib/auth')
 const settings = require('./lib/settings')
-const version = require('../package.json').version
+const packageJSON = require('../package.json')
 
 const SERVING_FOLDERS = [
     'styles',
@@ -220,7 +220,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true
         },
-        title: `Redlark ${version}`
+        title: `Redlark ${packageJSON.version}`
     })
     // mainWindow.maximize()
 
@@ -265,6 +265,9 @@ app.on('activate', function () {
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createWindow()
 })
+
+// Needed for native notifications to work on Windows
+app.setAppUserModelId(packageJSON.appId)
 
 return createServer()
     .then(() => {
