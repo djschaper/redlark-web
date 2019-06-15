@@ -35,6 +35,7 @@ const openSetButton = document.getElementById('open-set-button')
 const setList = document.getElementById('set-list')
 
 let allSongs = []
+let keySelect
 
 /// Functions ///////////////////////////////////////////////////////////
 const getSongList = () => {
@@ -75,6 +76,7 @@ const getSong = (event) => {
     const songIdSplit = song.id.split(SET_ID_PREFIX)
     const songId = song.id.split(SET_ID_PREFIX)[0]
     const key = song.querySelector('.key')
+    const isInSet = song.parentElement === setSongList
     
     let queryString = `id=${songId}`
     if (songIdSplit.length > 1) {
@@ -96,6 +98,24 @@ const getSong = (event) => {
                 const openSongHTML = new DOMParser().parseFromString(html, 'text/html')
                 key.innerText = openSongHTML.querySelector('key').innerText.split('-')[1].trim()
             }
+
+            if (isInSet) {
+                if (!isKeySet) {
+                    // User has yet to set a key, so update save button
+                    updateSaveButton(true)
+                }
+            }
+
+            previewWindow.addEventListener('load', () => {
+                const embeddedFullId = previewWindow.contentDocument.querySelector('meta[name=embedded-full-id]').content
+                keySelect = previewWindow.contentDocument.querySelector('#key-select')
+                keySelect.addEventListener('change', (event) => {
+                    if (embeddedFullId.includes(SET_ID_PREFIX)) {
+                        // Song is in set, so update save button
+                        updateSaveButton(true)
+                    }
+                })
+            })
         }
     })
 }
@@ -129,8 +149,6 @@ let setSongIndex = 0;
 const addToSet = (event) => {
     if (!dragged) return
 
-    updateSaveButton(true)
-
     // Don't add if dragging from set back to set
     if (dragged.parentElement === setSongList) return
 
@@ -148,6 +166,7 @@ const addToSet = (event) => {
     resetTextForElement(songTitle)
 
     setSongList.appendChild(copy)
+    updateSaveButton(true)
 }
 
 const removeFromSet = (event) => {
@@ -249,5 +268,9 @@ const loadSet = (event) => {
 
 Sortable.create(setSongList, {
     draggable: '.song',
-    animation: 150
+    animation: 150,
+    onUpdate: (event) => {
+        // Sort order changed, so update save button
+        updateSaveButton(true)
+    }
 })
