@@ -65,7 +65,6 @@ const getSets = () => {
         route: '/sets',
         type: RESPONSE_TYPES.XML,
         handler: (sets) => {
-            console.log(sets)
             setList.innerHTML = sets.body.innerHTML
         }
     })
@@ -153,7 +152,7 @@ const addToSet = (event) => {
     if (dragged.parentElement === setSongList) return
 
     // Prevent arbitrary elements being dragged into set
-    if (dragged.className !== 'song') return
+    if (!dragged.classList.contains('song')) return
 
     event.preventDefault()
     const copy = dragged.cloneNode(true)
@@ -263,6 +262,12 @@ document.getElementById('back-to-set-button').addEventListener('click', (event) 
 
 const loadSet = (event) => {
     // Load songs from set
+    let set = event.target.parentElement
+    while (!set.classList.contains('set')) {
+        set = set.parentElement
+    }
+    const setName = set.querySelector('.set-name').innerText
+    console.log(`Loading set: ${setName}`)
     goBackToSetView()
 }
 
