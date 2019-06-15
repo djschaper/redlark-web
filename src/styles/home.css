@@ -195,3 +195,13 @@
     border: 1px solid slategray;
     border-radius: 5px;
 }
+
+#edit-set-tools i {
+    padding-left: 10px;
+    padding-right: 0px;
+}
+
+#export-set-tools {
+    padding-top: 10px;
+    justify-content: center;
+}

@@ -33,6 +33,7 @@ const setNameInput = document.getElementById('set-name')
 const saveSetButton = document.getElementById('save-set-button')
 const openSetButton = document.getElementById('open-set-button')
 const setList = document.getElementById('set-list')
+const exportSetToolbar = document.getElementById('export-set-tools')
 
 let allSongs = []
 let keySelect
@@ -238,6 +239,8 @@ const searchSongs = (event) => {
 songSearchbox.addEventListener('keydown', (event) => setTimeout(() => searchSongs(event), 50))
 
 const updateSaveButton = (unsavedChanges) => {
+    updateExportSetToolbar()
+
     // Prevent saving if key is not selected for a song
     if (Array.from(setSongList.children).some(song => !parseChord(song.querySelector('.key').innerText))) {
         saveSetButton.setAttribute('disabled', 'disabled')
@@ -251,6 +254,21 @@ const updateSaveButton = (unsavedChanges) => {
     }
 }
 setNameInput.addEventListener('keydown', (event) => setTimeout(() => updateSaveButton(true), 50))
+
+const exportSetTools = Array.from(exportSetToolbar.children)
+const updateExportSetToolbar = () => {
+    if (
+        setSongList.childElementCount === 0 ||
+        Array.from(setSongList.children).some(song => !parseChord(song.querySelector('.key').innerText))
+    ) {
+        console.log('Disabling set export tools')
+        exportSetTools.forEach((tool) => tool.setAttribute('disabled', 'disabled'))
+        return
+    }
+
+    console.log('Enabling set export tools')
+    exportSetTools.forEach((tool) => tool.removeAttribute('disabled'))
+}
 
 const trySaveSet = () => {
     const setName = document.getElementById('set-name').value
@@ -327,6 +345,8 @@ const loadSet = (event) => {
 
     goBackToSetView()
 }
+
+updateExportSetToolbar()
 
 Sortable.create(setSongList, {
     draggable: '.song',
