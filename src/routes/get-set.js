@@ -9,12 +9,12 @@ const opensong = require('../lib/opensong')
 const handler = (request, reply) => {
     const setId = request.query.id
 
-    const songIds = []
+    const songs = []
 
     const finishReply = () => {
         reply.setHeader('content-type', 'application/json')
         reply.writeHead(200)
-        reply.write(JSON.stringify(songIds))
+        reply.write(JSON.stringify(songs))
         return reply.end()
     }
 
@@ -25,18 +25,26 @@ const handler = (request, reply) => {
     }
 
     const setXML = fs.readFileSync(setFilepath)
-    const $ = cheerio.load(setXML)
-    const songNames = Array.from($('slide_group')).map((song) => song.attribs['name'])
-    songNames.reduce((acc, val) => {
-        const id = opensong.getIdFromName(val)
-        if (id) {
-            acc.push(id)
+    const $ = cheerio.load(setXML, { xmlMode: true })
+    const setSongs = Array.from($('slide_group')).map((song) =>
+        ({
+            name: song.attribs['name'],
+            key: song.attribs['key']
+        })
+    )
+    setSongs.reduce((acc, val) => {
+        const song = {
+            id: opensong.getIdFromName(val.name),
+            key: val.key
+        }
+        if (song.id) {
+            acc.push(song)
         } else {
-            console.log(`Could not find id for song: ${val}`)
+            console.log(`Could not find id for song: ${val.name}`)
         }
         return acc
     },
-        songIds
+        songs
     )
 
     return finishReply()

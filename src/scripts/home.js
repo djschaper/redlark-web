@@ -158,7 +158,7 @@ const addToSet = (event) => {
     return addSongToSet(dragged)
 }
 
-const tryAddSongByIdToSet = (songId) => {
+const tryAddSongByIdToSet = (songId, key) => {
     const song = document.getElementById(songId)
 
     if (!song) {
@@ -166,10 +166,10 @@ const tryAddSongByIdToSet = (songId) => {
         return
     }
 
-    return addSongToSet(song)
+    return addSongToSet(song, key)
 }
 
-const addSongToSet = (song) => {
+const addSongToSet = (song, key) => {
     const copy = song.cloneNode(true)
     const id = song.getAttribute("id") + SET_ID_PREFIX + setSongIndex
     copy.setAttribute("id", id)
@@ -178,6 +178,10 @@ const addSongToSet = (song) => {
     const songTitle = copy.querySelector('.song-title')
     songTitle.style.display = 'unset'
     resetTextForElement(songTitle)
+
+    if (key) {
+        copy.querySelector('.key').innerText = key
+    }
 
     setSongList.appendChild(copy)
     updateSaveButton(true)
@@ -253,7 +257,26 @@ const trySaveSet = () => {
 }
 
 saveSetButton.addEventListener('click', (event) => {
-    updateSaveButton(false)
+    const setName = document.getElementById('set-name').value
+    const songs = Array.from(setSongList.children).map(song =>
+        ({
+            id: song.id.split(SET_ID_PREFIX)[0],
+            key: song.querySelector('.key').innerText
+        })
+    )
+
+    ajax({
+        method: 'POST',
+        route: '/set',
+        body: {
+            setName,
+            songs
+        },
+        headers: {
+            'content-type': 'application/json'
+        },
+        handler: () => updateSaveButton(false)
+    })
 })
 
 // Set view transitions
@@ -283,7 +306,6 @@ const loadSet = (event) => {
     }
     const setName = set.querySelector('.set-name').innerText
 
-    console.log(`Loading set: ${setName}`)
     ajax({
         method: 'GET',
         route: `/set?id=${set.id}`,
@@ -293,10 +315,13 @@ const loadSet = (event) => {
             setSongList.innerText = ''
 
             // Load songs from requested set
-            for (let id of setSongs) {
-                tryAddSongByIdToSet(id)
+            for (let song of setSongs) {
+                tryAddSongByIdToSet(song.id, song.key)
             }
             setNameInput.value = setName
+
+            // The save button should be disabled at this point, since the set was just loaded
+            updateSaveButton(false)
         }
     })
 

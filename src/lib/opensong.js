@@ -24,12 +24,15 @@ const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
 const idToPath = {}
 const pathToId = {}
 const nameToId = {}
+const idToName = {}
 
 function addIdPathPair(id, file_path) {
     idToPath[id] = file_path
     pathToId[file_path] = id
 
-    nameToId[path.basename(file_path)] = id
+    const name = path.basename(file_path)
+    nameToId[name] = id
+    idToName[id] = name
 }
 
 function getIdFromPath(file_path) {
@@ -42,6 +45,10 @@ function getPathFromId(id) {
 
 function getIdFromName(name) {
     return nameToId[name]
+}
+
+function getNameFromId(id) {
+    return idToName[id]
 }
 
 function getTranspositionChange(key, targetKey) {
@@ -388,4 +395,5 @@ module.exports = {
     getIdFromPath,
     getPathFromId,
     getIdFromName,
+    getNameFromId
 }
