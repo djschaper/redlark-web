@@ -87,11 +87,16 @@
         div.song-content {
         }
 
-        div.footer {
+        .song-wrapper-table {
+            width: 100%;
+        }
+
+        .footer, .footer-space {
+            height: 40px;
             width: 100%;
             text-align: center;
             font-size: x-small;
-            margin-top: 50px;
+            margin-top: 10px
         }
 
         @media print {
@@ -188,23 +193,34 @@
         </div>
     </div>
     <div class="song-wrapper">
-        <div class="page-content">
-            <table class="details">
-                <tr>
-                    <td>
-                        <song></song>
-                        <br>
-                        <author></author>
-                    </td>
-                    <td id="key-tempo">
-                        <key></key>
-                        <br>
-                        <tempo></tempo>
-                    </td>
-                </tr>
-            </table>
-            <div class="song-content"></div>
-        </div>
+        <table class="song-wrapper-table">
+            <tbody>
+                <tr><td>
+                    <div class="page-content">
+                            <table class="details">
+                                <tr>
+                                    <td>
+                                        <song></song>
+                                        <br>
+                                        <author></author>
+                                    </td>
+                                    <td id="key-tempo">
+                                        <key></key>
+                                        <br>
+                                        <tempo></tempo>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="song-content"></div>
+                        </div>
+                </td></tr>
+            </tbody>
+            <tfoot>
+                <tr><td>
+                <div class="footer-space">&nbsp;</div>
+                </td></tr>
+            </tfoot>
+        </table>
 
         <div class="footer"></div>
     </div>
