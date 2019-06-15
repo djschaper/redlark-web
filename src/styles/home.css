@@ -94,8 +94,24 @@
 }
 
 #set-list {
-    height: 100px;
+    min-height: 100px;
 }
+
+.set {
+    padding: 3px;
+    border-bottom: solid rgba(0,0,0,0.05) 1px;
+}
+
+    .set:last-child {
+        border-bottom: none;
+    }
+
+    .set:hover {
+        background-color: #6dccff;
+        border-bottom: solid white 1px;
+        cursor: default;
+        transition-duration: 0.1s;
+    }
 
 .song {
     width: calc(100% - 2px);

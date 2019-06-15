@@ -22,6 +22,34 @@ const MAJOR_KEYS = BASE_CHORDS
 const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
 
 const idToPath = {}
+const pathToId = {}
+const nameToId = {}
+const idToName = {}
+
+function addIdPathPair(id, file_path) {
+    idToPath[id] = file_path
+    pathToId[file_path] = id
+
+    const name = path.basename(file_path)
+    nameToId[name] = id
+    idToName[id] = name
+}
+
+function getIdFromPath(file_path) {
+    return pathToId[file_path]
+}
+
+function getPathFromId(id) {
+    return idToPath[id]
+}
+
+function getIdFromName(name) {
+    return nameToId[name]
+}
+
+function getNameFromId(id) {
+    return idToName[id]
+}
 
 function getTranspositionChange(key, targetKey) {
     fromBase = getBaseChord(key)[1]
@@ -363,5 +391,9 @@ function generateHTML(openSongFile, options = {}) {
 
 module.exports = {
     generateHTML,
-    idToPath
+    addIdPathPair,
+    getIdFromPath,
+    getPathFromId,
+    getIdFromName,
+    getNameFromId
 }

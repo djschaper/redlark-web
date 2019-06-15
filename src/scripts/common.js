@@ -18,5 +18,10 @@ const ajax = (params) => {
         }
     }
     xhttp.open(params.method, params.route, true)
-    xhttp.send(params.body)
+    if (params.headers) {
+        for (let key of Object.keys(params.headers)) {
+            xhttp.setRequestHeader(key, params.headers[key])
+        }
+    }
+    xhttp.send(JSON.stringify(params.body))
 }

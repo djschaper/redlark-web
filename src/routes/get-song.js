@@ -21,7 +21,7 @@ const handler = (request, reply) => {
         options.targetKey = decodeURIComponent(targetKey)
     }
 
-    const song = opensong.generateHTML(opensong.idToPath[songId], options)
+    const song = opensong.generateHTML(opensong.getPathFromId(songId), options)
 
     reply.setHeader('content-type', 'text/html')
     reply.writeHead(200)

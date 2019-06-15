@@ -35,6 +35,7 @@ const openSetButton = document.getElementById('open-set-button')
 const setList = document.getElementById('set-list')
 
 let allSongs = []
+let keySelect
 
 /// Functions ///////////////////////////////////////////////////////////
 const getSongList = () => {
@@ -64,7 +65,6 @@ const getSets = () => {
         route: '/sets',
         type: RESPONSE_TYPES.XML,
         handler: (sets) => {
-            console.log(sets)
             setList.innerHTML = sets.body.innerHTML
         }
     })
@@ -75,6 +75,7 @@ const getSong = (event) => {
     const songIdSplit = song.id.split(SET_ID_PREFIX)
     const songId = song.id.split(SET_ID_PREFIX)[0]
     const key = song.querySelector('.key')
+    const isInSet = song.parentElement === setSongList
     
     let queryString = `id=${songId}`
     if (songIdSplit.length > 1) {
@@ -96,6 +97,24 @@ const getSong = (event) => {
                 const openSongHTML = new DOMParser().parseFromString(html, 'text/html')
                 key.innerText = openSongHTML.querySelector('key').innerText.split('-')[1].trim()
             }
+
+            if (isInSet) {
+                if (!isKeySet) {
+                    // User has yet to set a key, so update save button
+                    updateSaveButton(true)
+                }
+            }
+
+            previewWindow.addEventListener('load', () => {
+                const embeddedFullId = previewWindow.contentDocument.querySelector('meta[name=embedded-full-id]').content
+                keySelect = previewWindow.contentDocument.querySelector('#key-select')
+                keySelect.addEventListener('change', (event) => {
+                    if (embeddedFullId.includes(SET_ID_PREFIX)) {
+                        // Song is in set, so update save button
+                        updateSaveButton(true)
+                    }
+                })
+            })
         }
     })
 }
@@ -129,17 +148,30 @@ let setSongIndex = 0;
 const addToSet = (event) => {
     if (!dragged) return
 
-    updateSaveButton(true)
-
     // Don't add if dragging from set back to set
     if (dragged.parentElement === setSongList) return
 
     // Prevent arbitrary elements being dragged into set
-    if (dragged.className !== 'song') return
+    if (!dragged.classList.contains('song')) return
 
     event.preventDefault()
-    const copy = dragged.cloneNode(true)
-    const id = dragged.getAttribute("id") + SET_ID_PREFIX + setSongIndex
+    return addSongToSet(dragged)
+}
+
+const tryAddSongByIdToSet = (songId, key) => {
+    const song = document.getElementById(songId)
+
+    if (!song) {
+        console.log(`Could not find song with id: ${songId}`)
+        return
+    }
+
+    return addSongToSet(song, key)
+}
+
+const addSongToSet = (song, key) => {
+    const copy = song.cloneNode(true)
+    const id = song.getAttribute("id") + SET_ID_PREFIX + setSongIndex
     copy.setAttribute("id", id)
     setSongIndex++
 
@@ -147,7 +179,12 @@ const addToSet = (event) => {
     songTitle.style.display = 'unset'
     resetTextForElement(songTitle)
 
+    if (key) {
+        copy.querySelector('.key').innerText = key
+    }
+
     setSongList.appendChild(copy)
+    updateSaveButton(true)
 }
 
 const removeFromSet = (event) => {
@@ -220,7 +257,26 @@ const trySaveSet = () => {
 }
 
 saveSetButton.addEventListener('click', (event) => {
-    updateSaveButton(false)
+    const setName = document.getElementById('set-name').value
+    const songs = Array.from(setSongList.children).map(song =>
+        ({
+            id: song.id.split(SET_ID_PREFIX)[0],
+            key: song.querySelector('.key').innerText
+        })
+    )
+
+    ajax({
+        method: 'POST',
+        route: '/set',
+        body: {
+            setName,
+            songs
+        },
+        headers: {
+            'content-type': 'application/json'
+        },
+        handler: () => updateSaveButton(false)
+    })
 })
 
 // Set view transitions
@@ -244,10 +300,39 @@ document.getElementById('back-to-set-button').addEventListener('click', (event) 
 
 const loadSet = (event) => {
     // Load songs from set
+    let set = event.target.parentElement
+    while (!set.classList.contains('set')) {
+        set = set.parentElement
+    }
+    const setName = set.querySelector('.set-name').innerText
+
+    ajax({
+        method: 'GET',
+        route: `/set?id=${set.id}`,
+        type: RESPONSE_TYPES.JSON,
+        handler: (setSongs) => {
+            // Clear set
+            setSongList.innerText = ''
+
+            // Load songs from requested set
+            for (let song of setSongs) {
+                tryAddSongByIdToSet(song.id, song.key)
+            }
+            setNameInput.value = setName
+
+            // The save button should be disabled at this point, since the set was just loaded
+            updateSaveButton(false)
+        }
+    })
+
     goBackToSetView()
 }
 
 Sortable.create(setSongList, {
     draggable: '.song',
-    animation: 150
+    animation: 150,
+    onUpdate: (event) => {
+        // Sort order changed, so update save button
+        updateSaveButton(true)
+    }
 })
