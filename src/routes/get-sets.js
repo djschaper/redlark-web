@@ -27,7 +27,7 @@ const handler = (request, reply) => {
         const id = 'id_set_' + val.replace(/\W/g, '-').toLowerCase()
 
         // Save id-filepath relationship for later access
-        opensong.idToPath[id] = path.join(openSongFolder, val)
+        opensong.addIdPathPair(id, path.join(openSongFolder, val))
 
         // Build HTML element
         const set = template('.set').clone()

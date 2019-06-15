@@ -108,8 +108,9 @@
 
     .set:hover {
         background-color: #6dccff;
-        border-color: transparent;
+        border-bottom: solid white 1px;
         cursor: default;
+        transition-duration: 0.1s;
     }
 
 .song {

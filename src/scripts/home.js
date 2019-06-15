@@ -155,8 +155,23 @@ const addToSet = (event) => {
     if (!dragged.classList.contains('song')) return
 
     event.preventDefault()
-    const copy = dragged.cloneNode(true)
-    const id = dragged.getAttribute("id") + SET_ID_PREFIX + setSongIndex
+    return addSongToSet(dragged)
+}
+
+const tryAddSongByIdToSet = (songId) => {
+    const song = document.getElementById(songId)
+
+    if (!song) {
+        console.log(`Could not find song with id: ${songId}`)
+        return
+    }
+
+    return addSongToSet(song)
+}
+
+const addSongToSet = (song) => {
+    const copy = song.cloneNode(true)
+    const id = song.getAttribute("id") + SET_ID_PREFIX + setSongIndex
     copy.setAttribute("id", id)
     setSongIndex++
 
@@ -267,7 +282,24 @@ const loadSet = (event) => {
         set = set.parentElement
     }
     const setName = set.querySelector('.set-name').innerText
+
     console.log(`Loading set: ${setName}`)
+    ajax({
+        method: 'GET',
+        route: `/set?id=${set.id}`,
+        type: RESPONSE_TYPES.JSON,
+        handler: (setSongs) => {
+            // Clear set
+            setSongList.innerText = ''
+
+            // Load songs from requested set
+            for (let id of setSongs) {
+                tryAddSongByIdToSet(id)
+            }
+            setNameInput.value = setName
+        }
+    })
+
     goBackToSetView()
 }
 

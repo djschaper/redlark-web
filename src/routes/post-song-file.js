@@ -42,11 +42,11 @@ const handler = (request, reply) => {
         reply.end()
     }
 
-    const song = opensong.generateHTML(opensong.idToPath[songId], { targetKey: key })
+    const song = opensong.generateHTML(opensong.getPathFromId(songId), { targetKey: key })
     
-    let tmpFilename = path.basename(opensong.idToPath[songId]) + EXTENSIONS[format]
+    let tmpFilename = path.basename(opensong.getPathFromId(songId)) + EXTENSIONS[format]
     if (format === 'pdf') {
-        tmpFilename = path.basename(opensong.idToPath[songId]) + ' - ' + song.key + EXTENSIONS[format]
+        tmpFilename = path.basename(opensong.getPathFromId(songId)) + ' - ' + song.key + EXTENSIONS[format]
     }
     const tmpFilepath = path.join(settings.getPath('temp'), tmpFilename)
 
