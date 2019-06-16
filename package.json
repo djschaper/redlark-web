@@ -15,7 +15,7 @@
     "start:dev": "nodemon --watch * --ext js,html,css --exec \"electron .\"",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --x64 --ia32 --win",
-    "release": "build"
+    "release": "build --x64 --ia32 --win"
   },
   "dependencies": {
     "aws-sdk": "^2.270.1",
