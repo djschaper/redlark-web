@@ -1,6 +1,6 @@
 {
   "name": "redlark",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "appId": "com.schaper.redlark",
   "private": true,
   "main": "src/app.js",
@@ -14,7 +14,7 @@
     "start": "electron .",
     "start:dev": "nodemon --watch * --ext js,html,css --exec \"electron .\"",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win --ia32 --x64",
+    "dist": "electron-builder --x64 --ia32 --win",
     "release": "build"
   },
   "dependencies": {
