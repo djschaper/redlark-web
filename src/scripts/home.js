@@ -50,7 +50,8 @@ const getSongList = () => {
 
             allSongs = Array.from(songList.children).map(song => ({
                 title: song.innerText.toLowerCase(),
-                html: song.outerHTML
+                html: song.outerHTML,
+                element: song
             }))
         }
     })
@@ -161,14 +162,14 @@ const addToSet = (event) => {
 }
 
 const tryAddSongByIdToSet = (songId, key) => {
-    const song = document.getElementById(songId)
+    const song = allSongs.find(song => song.element.id === songId)
 
     if (!song) {
         console.log(`Could not find song with id: ${songId}`)
         return
     }
 
-    return addSongToSet(song, key)
+    return addSongToSet(song.element, key)
 }
 
 const addSongToSet = (song, key) => {
