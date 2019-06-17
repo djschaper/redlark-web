@@ -32,7 +32,11 @@ const songSearchbox = document.getElementById('song-searchbox')
 const setNameInput = document.getElementById('set-name')
 const saveSetButton = document.getElementById('save-set-button')
 const openSetButton = document.getElementById('open-set-button')
+const newSetButton = document.getElementById('new-set-button')
+const printSetButton = document.getElementById('print-set-button')
+const savePDFSetButton = document.getElementById('pdf-set-button')
 const setList = document.getElementById('set-list')
+const exportSetToolbar = document.getElementById('export-set-tools')
 
 let allSongs = []
 let keySelect
@@ -48,7 +52,8 @@ const getSongList = () => {
 
             allSongs = Array.from(songList.children).map(song => ({
                 title: song.innerText.toLowerCase(),
-                html: song.outerHTML
+                html: song.outerHTML,
+                element: song
             }))
         }
     })
@@ -106,6 +111,7 @@ const getSong = (event) => {
             }
 
             previewWindow.addEventListener('load', () => {
+                previewWindow.removeAttribute('srcdoc')
                 const embeddedFullId = previewWindow.contentDocument.querySelector('meta[name=embedded-full-id]').content
                 keySelect = previewWindow.contentDocument.querySelector('#key-select')
                 keySelect.addEventListener('change', (event) => {
@@ -159,14 +165,14 @@ const addToSet = (event) => {
 }
 
 const tryAddSongByIdToSet = (songId, key) => {
-    const song = document.getElementById(songId)
+    const song = allSongs.find(song => song.element.id === songId)
 
     if (!song) {
         console.log(`Could not find song with id: ${songId}`)
         return
     }
 
-    return addSongToSet(song, key)
+    return addSongToSet(song.element, key)
 }
 
 const addSongToSet = (song, key) => {
@@ -238,6 +244,8 @@ const searchSongs = (event) => {
 songSearchbox.addEventListener('keydown', (event) => setTimeout(() => searchSongs(event), 50))
 
 const updateSaveButton = (unsavedChanges) => {
+    updateExportSetToolbar()
+
     // Prevent saving if key is not selected for a song
     if (Array.from(setSongList.children).some(song => !parseChord(song.querySelector('.key').innerText))) {
         saveSetButton.setAttribute('disabled', 'disabled')
@@ -252,13 +260,30 @@ const updateSaveButton = (unsavedChanges) => {
 }
 setNameInput.addEventListener('keydown', (event) => setTimeout(() => updateSaveButton(true), 50))
 
+const exportSetTools = Array.from(exportSetToolbar.children)
+const updateExportSetToolbar = () => {
+    if (
+        setSongList.childElementCount === 0 ||
+        Array.from(setSongList.children).some(song => !parseChord(song.querySelector('.key').innerText))
+    ) {
+        console.log('Disabling set export tools')
+        exportSetTools.forEach((tool) => tool.setAttribute('disabled', 'disabled'))
+        return
+    }
+
+    console.log('Enabling set export tools')
+    exportSetTools.forEach((tool) => tool.removeAttribute('disabled'))
+}
+
 const trySaveSet = () => {
     const setName = document.getElementById('set-name').value
 }
 
+const getSongsInSet = () => Array.from(setSongList.children)
+
 saveSetButton.addEventListener('click', (event) => {
     const setName = document.getElementById('set-name').value
-    const songs = Array.from(setSongList.children).map(song =>
+    const songs = getSongsInSet().map(song =>
         ({
             id: song.id.split(SET_ID_PREFIX)[0],
             key: song.querySelector('.key').innerText
@@ -327,6 +352,44 @@ const loadSet = (event) => {
 
     goBackToSetView()
 }
+
+const clearSet = () => {
+    setSongList.innerText = ''
+    setNameInput.value = ''
+
+    updateSaveButton(false)
+}
+newSetButton.addEventListener('click', clearSet)
+
+postSetFile = (print, handler) => {
+    const songs = getSongsInSet().map(song => ({
+        id: song.id.split(SET_ID_PREFIX)[0],
+        key: song.querySelector('.key').innerText
+    }))
+    const name = setNameInput.value === '' ? 'Full Set' : setNameInput.value
+    const type = print ? RESPONSE_TYPES.TEXT : RESPONSE_TYPES.JSON
+
+    document.body.style.cursor = 'wait'
+    ajax({
+        method: 'POST',
+        route: '/set/file',
+        type,
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: {
+            name,
+            songs,
+            print
+        },
+        handler
+    })
+}
+
+savePDFSetButton.addEventListener('click', () => postSetFile(false, (res) => downloadLink(res.download, res.name)))
+printSetButton.addEventListener('click', () => postSetFile(true, (html) => printHTML(html)))
+
+updateExportSetToolbar()
 
 Sortable.create(setSongList, {
     draggable: '.song',
