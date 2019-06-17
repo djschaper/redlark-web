@@ -32,6 +32,7 @@ const songSearchbox = document.getElementById('song-searchbox')
 const setNameInput = document.getElementById('set-name')
 const saveSetButton = document.getElementById('save-set-button')
 const openSetButton = document.getElementById('open-set-button')
+const newSetButton = document.getElementById('new-set-button')
 const setList = document.getElementById('set-list')
 const exportSetToolbar = document.getElementById('export-set-tools')
 
@@ -345,6 +346,14 @@ const loadSet = (event) => {
 
     goBackToSetView()
 }
+
+const clearSet = () => {
+    setSongList.innerText = ''
+    setNameInput.value = ''
+
+    updateSaveButton(false)
+}
+newSetButton.addEventListener('click', clearSet)
 
 updateExportSetToolbar()
 
