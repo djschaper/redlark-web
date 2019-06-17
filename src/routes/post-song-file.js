@@ -1,11 +1,11 @@
-const puppeteer = require('puppeteer')
-
 const path = require('path')
 const fs = require('fs')
 
 const { AUTH_METHODS } = require('../lib/auth')
 const opensong = require('../lib/opensong')
 const settings = require('../lib/settings')
+const pdf = require('../lib/pdf')
+const server = require('../lib/server')
 
 const EXTENSIONS = {
     pdf: ".pdf",
@@ -13,40 +13,33 @@ const EXTENSIONS = {
 }
 const DOWNLOAD_ROUTE_BASE = '/download/'
 
-// To workaround Puppeteer needing to be unpacked and resolving its path properly when distributed
-const createBrowser = (options = {}) => {
-    return puppeteer.launch({
-        ...options,
-        executablePath: puppeteer.executablePath().replace('app.asar', 'app.asar.unpacked')
-    });
-}
-
 const handler = (request, reply) => {
     const songId = request.body.id
     const format = request.body.format
     const key = request.body.key
     
-    if (!songId) {
+    const respondBad = (message) => {
         reply.writeHead(400)
-        reply.write('Required query parameter "id" missing.')
-        reply.end()
-    }
-    if (!format) {
-        reply.writeHead(400)
-        reply.write('Required query parameter "format" missing.')
-        reply.end()
-    }
-    if (!(format in EXTENSIONS)) {
-        reply.writeHead(400)
-        reply.write(`Format not valid: ${format}`)
-        reply.end()
+        reply.write(message)
+        return reply.end()
     }
 
-    const song = opensong.generateHTML(opensong.getPathFromId(songId), { targetKey: key })
+    if (!songId) {
+        return server.respond.missingParameter(reply, 'id')
+    }
+    if (!format) {
+        return server.respond.missingParameter(reply, 'format')
+    }
+    if (!(format in EXTENSIONS)) {
+        return server.respond.badRequest(reply, `Format not valid: ${format}`)
+    }
+
+    const opensongFilepath = opensong.getPathFromId(songId)
+    const song = opensong.generateHTML(opensongFilepath, { targetKey: key })
     
-    let tmpFilename = path.basename(opensong.getPathFromId(songId)) + EXTENSIONS[format]
+    let tmpFilename = path.basename(opensongFilepath) + EXTENSIONS[format]
     if (format === 'pdf') {
-        tmpFilename = path.basename(opensong.getPathFromId(songId)) + ' - ' + song.key + EXTENSIONS[format]
+        tmpFilename = path.basename(opensongFilepath) + ' - ' + song.key + EXTENSIONS[format]
     }
     const tmpFilepath = path.join(settings.getPath('temp'), tmpFilename)
 
@@ -69,28 +62,7 @@ const handler = (request, reply) => {
 
     // Write files and then use callback to finish response
     if (format === 'pdf') {
-        let browser
-        let page
-        return createBrowser()
-            .then((res) => {
-                browser = res
-                return browser.newPage()
-            })
-            .then((res) => {
-                page = res
-                return page.setContent(song.html)
-            })
-            .then(() => page.pdf({
-                path: tmpFilepath,
-                format: 'Letter',
-                margin: {
-                    top: '0.5in',
-                    bottom: '0.3in',
-                    left: '0.5in',
-                    right: '0.5in'
-                }
-            }))
-            .then(() => browser.close())
+        return pdf.savePDF(tmpFilepath, song.html)
             .then(() => respond())
     } else {
         fs.writeFileSync(tmpFilepath, song.html)

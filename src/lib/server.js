@@ -34,8 +34,24 @@ const setCookie = (reply, key, value) => {
     reply.setHeader('set-cookie', pendingCookies)
 }
 
+const badRequest = (reply, message) => {
+    reply.writeHead(400)
+    reply.write(message)
+    return reply.end()
+}
+
+const missingParameter = (reply, parameterName) => {
+    return this.badRequest(reply, `Missing parameter: ${parameterName}`)
+}
+
+const respond = {
+    badRequest,
+    missingParameter
+}
+
 module.exports = {
     redirect,
+    respond,
     getCookie,
     setCookie
 }

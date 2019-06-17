@@ -33,6 +33,8 @@ const setNameInput = document.getElementById('set-name')
 const saveSetButton = document.getElementById('save-set-button')
 const openSetButton = document.getElementById('open-set-button')
 const newSetButton = document.getElementById('new-set-button')
+const printSetButton = document.getElementById('print-set-button')
+const savePDFSetButton = document.getElementById('pdf-set-button')
 const setList = document.getElementById('set-list')
 const exportSetToolbar = document.getElementById('export-set-tools')
 
@@ -109,6 +111,7 @@ const getSong = (event) => {
             }
 
             previewWindow.addEventListener('load', () => {
+                previewWindow.removeAttribute('srcdoc')
                 const embeddedFullId = previewWindow.contentDocument.querySelector('meta[name=embedded-full-id]').content
                 keySelect = previewWindow.contentDocument.querySelector('#key-select')
                 keySelect.addEventListener('change', (event) => {
@@ -276,9 +279,11 @@ const trySaveSet = () => {
     const setName = document.getElementById('set-name').value
 }
 
+const getSongsInSet = () => Array.from(setSongList.children)
+
 saveSetButton.addEventListener('click', (event) => {
     const setName = document.getElementById('set-name').value
-    const songs = Array.from(setSongList.children).map(song =>
+    const songs = getSongsInSet().map(song =>
         ({
             id: song.id.split(SET_ID_PREFIX)[0],
             key: song.querySelector('.key').innerText
@@ -355,6 +360,34 @@ const clearSet = () => {
     updateSaveButton(false)
 }
 newSetButton.addEventListener('click', clearSet)
+
+postSetFile = (print, handler) => {
+    const songs = getSongsInSet().map(song => ({
+        id: song.id.split(SET_ID_PREFIX)[0],
+        key: song.querySelector('.key').innerText
+    }))
+    const name = setNameInput.value === '' ? 'Full Set' : setNameInput.value
+    const type = print ? RESPONSE_TYPES.TEXT : RESPONSE_TYPES.JSON
+
+    document.body.style.cursor = 'wait'
+    ajax({
+        method: 'POST',
+        route: '/set/file',
+        type,
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: {
+            name,
+            songs,
+            print
+        },
+        handler
+    })
+}
+
+savePDFSetButton.addEventListener('click', () => postSetFile(false, (res) => downloadLink(res.download, res.name)))
+printSetButton.addEventListener('click', () => postSetFile(true, (html) => printHTML(html)))
 
 updateExportSetToolbar()
 

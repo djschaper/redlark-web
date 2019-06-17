@@ -87,6 +87,10 @@
         div.song-content {
         }
 
+        .song-wrapper {
+            page-break-after: always;
+        }
+
         .song-wrapper-table {
             width: 100%;
         }
@@ -142,6 +146,7 @@
 
         #key-tempo {
             text-align: right;
+            min-width: 170px;
         }
 
         /* Song Contents */
@@ -149,6 +154,10 @@
             display: block;
             margin-top: 30px;
             break-inside: avoid;
+        }
+
+        div.section:last-child {
+            margin-bottom: 10px;
         }
 
         .indented {
@@ -194,6 +203,7 @@
     </div>
     <div class="song-wrapper">
         <table class="song-wrapper-table">
+            <thead><tr><th></th></tr></thead>
             <tbody>
                 <tr><td>
                     <div class="page-content">

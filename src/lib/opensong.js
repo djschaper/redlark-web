@@ -389,8 +389,33 @@ function generateHTML(openSongFile, options = {}) {
     
 }
 
+function generateSetHTML(songs) {
+    const allSongs = songs.map(song => generateHTML(song.file, song.options))
+
+    // Merge them all together semi-intelligently
+    const style = cheerio.load(allSongs[0].html)('style').clone()
+    const songContents = allSongs.map(song => {
+        const $ = cheerio.load(song.html)
+
+        // Remove the absolute bottom-positioned footer, and use table footer
+        $('.footer-space').text($('.footer').text())
+        $('.footer').remove()
+
+        return $('.song-wrapper').clone()
+    })
+
+    const $ = cheerio.load('')
+    $('head').append(style)
+    for (let content of songContents) {
+        $('body').append(content)
+    }
+
+    return $.html()
+}
+
 module.exports = {
     generateHTML,
+    generateSetHTML,
     addIdPathPair,
     getIdFromPath,
     getPathFromId,
