@@ -117,8 +117,8 @@
         }
 
         .dark-theme {
-            background-color: black;
-            color: white;
+            background-color: #1f1f1f;
+            color: #efefef;
         }
 
         /* Song Metadata */
@@ -304,12 +304,20 @@
         const displayMode = document.getElementById('display-mode')
         displayMode.addEventListener('click', (event) => {
             const songWrapper = document.getElementsByTagName('body')[0]
+            const topDarkMode = window.top.document.getElementById('dark-mode')
+
             if (displayMode.className.includes('far')) {
                 displayMode.className = displayMode.className.replace('far', 'fas')
                 songWrapper.classList.add('dark-theme')
+                if (topDarkMode) {
+                    topDarkMode.setAttribute('enabled', 'enabled')
+                }
             } else {
                 displayMode.className = displayMode.className.replace('fas', 'far')
                 songWrapper.classList.remove('dark-theme')
+                if (topDarkMode) {
+                    topDarkMode.removeAttribute('enabled')
+                }
             }
         })
 

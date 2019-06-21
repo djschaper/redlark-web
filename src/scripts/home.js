@@ -37,6 +37,7 @@ const printSetButton = document.getElementById('print-set-button')
 const savePDFSetButton = document.getElementById('pdf-set-button')
 const setList = document.getElementById('set-list')
 const exportSetToolbar = document.getElementById('export-set-tools')
+const darkMode = document.getElementById('dark-mode')
 
 let allSongs = []
 let keySelect
@@ -110,9 +111,14 @@ const getSong = (event) => {
                 }
             }
 
-            previewWindow.addEventListener('load', () => {
+            const onLoad = () => {
+                previewWindow.removeEventListener('load', onLoad)
                 previewWindow.removeAttribute('srcdoc')
                 const embeddedFullId = previewWindow.contentDocument.querySelector('meta[name=embedded-full-id]').content
+                if (darkMode.hasAttribute('enabled')) {
+                    previewWindow.contentDocument.querySelector('#display-mode').click()
+                    console.log('Enabling dark mode!')
+                }
                 keySelect = previewWindow.contentDocument.querySelector('#key-select')
                 keySelect.addEventListener('change', (event) => {
                     if (embeddedFullId.includes(SET_ID_PREFIX)) {
@@ -120,7 +126,9 @@ const getSong = (event) => {
                         updateSaveButton(true)
                     }
                 })
-            })
+            }
+
+            previewWindow.addEventListener('load', onLoad)
         }
     })
 }

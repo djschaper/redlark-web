@@ -17,6 +17,12 @@
     max-height: 35px;
 }
 
+    #dark-mode[enabled] ~ #page #song-searchbox-container {
+        background-color: #585858;
+        border-color: #aaaaaa;
+        color: #eeeeee
+    }
+
 #song-searchbox {
     border: none;
     background-color: transparent;
@@ -27,6 +33,10 @@
     height: 100%;
     color: #555555;
 }
+
+    #dark-mode[enabled] ~ #page #song-searchbox {
+        color: #eeeeee;
+    }
 
 #song-searchbox-container i {
     padding: 5px;
@@ -87,7 +97,13 @@
     border-bottom: 1px solid #a9a9a9;
     font-style: italic;
     font-size: medium;
+    background-color: transparent;
 }
+
+    #dark-mode[enabled] ~ #page #set-name {
+        color: #a9a9a9;
+        border-bottom-color: #a9a9a9;
+    }
 
 #edit-set-view {
     height: 100%;
@@ -113,6 +129,16 @@
         transition-duration: 0.1s;
     }
 
+    #dark-mode[enabled] ~ #page .set {
+        color: #eeeeee;
+        border-bottom-color: rgba(0,0,0,0.9);
+    }
+
+    #dark-mode[enabled] ~ #page .set:hover {
+        border-bottom-color: #111111;
+        background-color: #2a769e;
+    }
+
 .song {
     width: calc(100% - 2px);
     display: flex;
@@ -127,10 +153,21 @@
     border: 1px solid #e8e8da;
 }
 
+    #dark-mode[enabled] ~ #page .song {
+        background-color: #333333;
+        color: #cccccc;
+        border-color: #111111;
+    }
+
     .song:hover {
         background-color: #6dccff;
         border-color: #2589bd;
         cursor: default;
+    }
+
+    #dark-mode[enabled] ~ #page .song:hover {
+        background-color: #2a769e;
+        border-color: #1e5370;
     }
 
     .song .song-title-container {
@@ -159,6 +196,10 @@
         transition-duration: 0.5s;
     }
 
+    #dark-mode[enabled] ~ #page .song .remove {
+        color: #aaaaaa;
+    }
+
     .song .key {
         display: none;
         opacity: 0;
@@ -169,6 +210,10 @@
         color: #2589bd;
         margin: 5px;
         transition-duration: 0.5s;
+    }
+
+    #dark-mode[enabled] ~ #page .song .key {
+        color: #277aa7;
     }
 
 #song-list .song:hover {
@@ -187,12 +232,16 @@
     opacity: 1;
 }
 
+    #dark-mode[enabled] ~ #page #set-song-list .song:hover .key {
+        color: #15425a;
+    }
+
 #preview-window {
     height: 100vh;
     width: calc(100% - 10px);
     padding: 0;
     background-color: #d1d1d1;
-    border: 1px solid slategray;
+    border: 1px solid #2589bd;
     border-radius: 5px;
 }
 

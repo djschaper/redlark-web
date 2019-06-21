@@ -15,6 +15,10 @@ h2 {
     color: #333333;
 }
 
+    #dark-mode[enabled] ~ #page h2 {
+        color: #dddddd;
+    }
+
 #root {
     height: 100%;
 }
@@ -195,9 +199,9 @@ h2 {
     background-color: #adc698;
 }
 
-.section {
-    /*background-color: #edf3f9;*/
-}
+    #dark-mode[enabled] ~ #page #content {
+        background-color: black;
+    }
 
 .section-content {
     padding: 10px;
@@ -213,6 +217,10 @@ h2 {
 
     .section-content * {
         margin: 0;
+    }
+
+    #dark-mode[enabled] ~ #page .section-content {
+        background-color: #222222;
     }
 
 :focus {
@@ -239,6 +247,22 @@ h2 {
         color: grey;
     }
 
+    #dark-mode[enabled] ~ #page .dark-button {
+        color: #aaaaaa;
+    }
+
+    #dark-mode[enabled] ~ #page .dark-button:hover {
+        color: #2589bd;
+    }
+
+    #dark-mode[enabled] ~ #page .dark-button:active {
+        color: #2aa2e0;
+    }
+
+    #dark-mode[enabled] ~ #page .dark-button:disabled {
+        color: #555555;
+    }
+
 .object-list, .object-list-editable {
     list-style-type: none;
     padding: 5px;
@@ -254,6 +278,10 @@ h2 {
 
     .object-list::-webkit-scrollbar, .object-list-editable::-webkit-scrollbar {
         display: none;
+    }
+
+    #dark-mode[enabled] ~ #page .object-list, #dark-mode[enabled] ~ #page .object-list-editable {
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
     }
 
 .object-list-editable {
@@ -340,4 +368,8 @@ h2 {
     #page {
         display: none;
     }
+}
+
+#dark-mode {
+    display: none;
 }
