@@ -250,7 +250,7 @@
 
 #preview-window {
     height: 100vh;
-    width: calc(100% - 10px);
+    width: calc(100% - 2px);
     padding: 0;
     background-color: #d1d1d1;
     border: 1px solid #2589bd;
