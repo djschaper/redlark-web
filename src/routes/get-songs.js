@@ -3,35 +3,28 @@ const fs = require('fs')
 const cheerio = require('cheerio')
 
 const { AUTH_METHODS } = require('../lib/auth')
-const settings = require('../lib/settings')
 const opensong = require('../lib/opensong')
 
 const SONG_HTML_TEMPLATE_PATH = path.resolve(__dirname, '../pages/templates/song.html')
-const SONGS_SUB_FOLDER = "Songs"
+const RECENT_SET_THRESHOLD = 12
 
 const handler = (request, reply) => {
-    const openSongFolder = path.join(settings.get(settings.dict.OPENSONG_FOLDER), SONGS_SUB_FOLDER)
-    var files = []
-    if (fs.existsSync(openSongFolder)) {
-        files = fs.readdirSync(openSongFolder)
-    } else {
-        console.log(`OpenSong Songs folder "${openSongFolder}" does not exist`)
-    }
-    
-    const openSongFiles = files.filter(file => file.indexOf('.') < 0)
+    const openSongSongs = opensong.getAllSongNamesAndIds()
 
     const songList = cheerio.load('<ul></ul>')('ul')
     const template = cheerio.load(fs.readFileSync(SONG_HTML_TEMPLATE_PATH))
-    openSongFiles.reduce((acc, val) => {
-        const id = 'id_' + val.replace(/\W/g, '-').toLowerCase()
-
-        // Save id-filepath relationship for later access
-        opensong.addIdPathPair(id, path.join(openSongFolder, val))
+    openSongSongs.reduce((acc, val) => {
+        recentSet = opensong.getMostRecentSetSongWasIn(val.name)
 
         // Build HTML element
         const song = template('.song').clone()
-        song.attr('id', id)
-        song.find('.song-title').text(val)
+        song.attr('id', val.id)
+        song.find('.song-title').text(val.name)
+        if (recentSet) {
+            song.attr('data-recent-set', recentSet.name)
+            const recentPercentage = Math.max(0, (RECENT_SET_THRESHOLD - recentSet.index)/RECENT_SET_THRESHOLD)
+            song.find('.recent').css('opacity', recentPercentage.toString())
+        }
         acc.append(song)
         return acc
     },

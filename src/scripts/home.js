@@ -117,7 +117,9 @@ const getSong = (event) => {
                 const embeddedFullId = previewWindow.contentDocument.querySelector('meta[name=embedded-full-id]').content
                 if (darkMode.hasAttribute('enabled')) {
                     previewWindow.contentDocument.querySelector('#display-mode').click()
-                    console.log('Enabling dark mode!')
+                }
+                if ('recentSet' in song.dataset) {
+                    previewWindow.contentDocument.getElementById('info-text').innerText = `Last set: "${song.dataset.recentSet}"`
                 }
                 keySelect = previewWindow.contentDocument.querySelector('#key-select')
                 keySelect.addEventListener('change', (event) => {

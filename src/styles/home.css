@@ -188,7 +188,19 @@
         left: 0;
     }
 
-    .song .remove{
+    .song .recent {
+        display: none;
+        opacity: 0;
+        padding: 5px;
+        font-size: 7px;
+        color: #277aa7;
+    }
+
+    #song-list .song .recent {
+        display: block;
+    }
+
+    .song .remove {
         display: none;
         opacity: 0;
         padding: 3px;

@@ -3,6 +3,10 @@ const cheerio = require('cheerio')
 const fs = require('fs')
 const path = require('path')
 
+const settings = require('./settings')
+
+const SETS_SUB_FOLDER = "Sets"
+const SONGS_SUB_FOLDER = "Songs"
 const TEMPLATE = path.resolve(__dirname, '../pages/templates/opensong.html')
 const BASE_CHORDS = [
     'A',
@@ -20,6 +24,9 @@ const BASE_CHORDS = [
 ]
 const MAJOR_KEYS = BASE_CHORDS
 const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
+
+let allSets = null
+let songsInSets = {}
 
 const idToPath = {}
 const pathToId = {}
@@ -49,6 +56,128 @@ function getIdFromName(name) {
 
 function getNameFromId(id) {
     return idToName[id]
+}
+
+function getAllSetNamesAndIds() {
+    const openSongFolder = path.join(settings.get(settings.dict.OPENSONG_FOLDER), SETS_SUB_FOLDER)
+    let files = []
+    if (fs.existsSync(openSongFolder)) {
+        files = fs.readdirSync(openSongFolder)
+    }
+    
+    const setFiles = files.filter(file => file.indexOf('.') < 0)
+    setFiles.sort().reverse()
+    
+    const sets = []
+    setFiles.reduce((acc, val) => {
+        const id = 'id_set_' + val.replace(/\W/g, '-').toLowerCase()
+
+        // Save id-filepath relationship for later access
+        addIdPathPair(id, path.join(openSongFolder, val))
+
+        acc.push({
+            id,
+            name: val
+        })
+        return acc
+    },
+        sets
+    )
+
+    // cache for later
+    allSets = sets
+
+    return sets
+}
+
+function getAllSongNamesAndIds() {
+    const openSongFolder = path.join(settings.get(settings.dict.OPENSONG_FOLDER), SONGS_SUB_FOLDER)
+    let files = []
+    if (fs.existsSync(openSongFolder)) {
+        files = fs.readdirSync(openSongFolder)
+    } else {
+        console.log(`OpenSong Songs folder "${openSongFolder}" does not exist`)
+    }
+
+    files = files.filter(file => file.indexOf('.') < 0)
+
+    let songs = []
+    files.reduce((acc, val) => {
+        const id = 'id_' + val.replace(/\W/g, '-').toLowerCase()
+
+        // Save id-filepath relationship for later access
+        addIdPathPair(id, path.join(openSongFolder, val))
+
+        acc.push({
+            id,
+            name: val
+        })
+        return acc
+    },
+        songs
+    )
+    
+    return songs
+}
+
+function getSongsFromSetXML(xml) {
+    const $ = cheerio.load(xml, { xmlMode: true })
+    return Array.from($('slide_group')).map((song) =>
+        ({
+            name: song.attribs['name'],
+            key: song.attribs['key']
+        })
+    )
+}
+
+function getSetSongs(filepath) {
+    const setXML = fs.readFileSync(filepath)
+    const setSongs = getSongsFromSetXML(setXML)
+
+    const songs = []
+    setSongs.reduce((acc, val) => {
+        const song = {
+            id: getIdFromName(val.name),
+            key: val.key
+        }
+        if (song.id) {
+            acc.push(song)
+        } else {
+            console.log(`Could not find id for song: ${val.name}`)
+        }
+        return acc
+    },
+        songs
+    )
+
+    return songs
+}
+
+function getMostRecentSetSongWasIn(songName) {
+    // Used cached set list if possible
+    if (!allSets) {
+        getAllSetNamesAndIds()
+    }
+
+    mostRecentSetIndex = allSets.findIndex(set => {
+        let songs
+        if (set.id in songsInSets) {
+            // Use cached set-song groups if possible
+            songs = songsInSets[set.id]
+        } else {
+            songs = getSongsFromSetXML(fs.readFileSync(getPathFromId(set.id)))
+            songsInSets[set.id] = songs
+        }
+        
+        return songs.map(song => song.name).includes(songName)
+    })
+
+    if (mostRecentSetIndex < 0) {
+        return null
+    }
+
+    allSets[mostRecentSetIndex].index = mostRecentSetIndex
+    return allSets[mostRecentSetIndex]
 }
 
 function getTranspositionChange(key, targetKey) {
@@ -420,5 +549,9 @@ module.exports = {
     getIdFromPath,
     getPathFromId,
     getIdFromName,
-    getNameFromId
+    getNameFromId,
+    getSetSongs,
+    getAllSongNamesAndIds,
+    getAllSetNamesAndIds,
+    getMostRecentSetSongWasIn
 }
