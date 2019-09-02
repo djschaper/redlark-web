@@ -25,6 +25,7 @@
     "electron-updater": "^4.0.6",
     "glob": "^7.1.2",
     "googleapis": "^32.0.0",
+    "moment": "^2.24.0",
     "mysql2": "^1.5.3",
     "opn": "^5.4.0",
     "password-hash": "^1.2.2",

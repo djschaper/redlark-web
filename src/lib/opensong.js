@@ -1,4 +1,5 @@
 const cheerio = require('cheerio')
+const moment = require('moment')
 
 const fs = require('fs')
 const path = require('path')
@@ -153,6 +154,21 @@ function getSetSongs(filepath) {
     return songs
 }
 
+function parseSetDate(setName) {
+    // Capture groups of numbers, presumably something like: YYYY-MM-dd
+    const dateParts = setName.match(/\d+/gm)
+    // Need at least 3 results for year, month, day
+    if (dateParts.length < 3) {
+        return null
+    }
+
+    const setDate = moment(setName, 'YYYY-MM-DD')
+    if (!setDate.isValid()) {
+        return null
+    }
+    return setDate
+}
+
 function getMostRecentSetSongWasIn(songName) {
     // Used cached set list if possible
     if (!allSets) {
@@ -160,6 +176,17 @@ function getMostRecentSetSongWasIn(songName) {
     }
 
     mostRecentSetIndex = allSets.findIndex(set => {
+        // Don't include Sunday night sets in recent sets
+        if (set.name.toLowerCase().includes('pm')) {
+            return false;
+        }
+
+        const setDate = parseSetDate(set.name)
+        // Don't include sets with future dates
+        if (setDate && moment() < setDate) {
+            return false;
+        }
+
         let songs
         if (set.id in songsInSets) {
             // Use cached set-song groups if possible
