@@ -14,8 +14,23 @@ const handler = (request, reply) => {
 
     const $ = cheerio.load(html)
 
-    console.log(settings.keys)
-    settings.keys.forEach(key => $(`#${key}`).attr('value', settings.get(key)))
+    Object.values(settings.raw).forEach(setting => {
+        const key = setting.key
+        const value = settings.get(setting.key)
+        
+        if (setting.type == 'text') {
+            $(`#${key}`).attr('value', value)
+        } else if (setting.type == 'radio') {
+            if (value == undefined || value === 'undefined') {
+                return
+            }
+            $(`#${key}-${value}`).attr('checked', '')
+        } else if (setting.type == 'checkbox') {
+            if (value != 'undefined') {
+                $(`#${key}`).attr('checked', '')
+            }
+        }
+    })
 
     reply.writeHead(200)
     reply.write($.html())

@@ -1,6 +1,7 @@
 .setting-field {
     display: flex;
     align-items: center;
+    margin-top: 10px;
 }
 
     .setting-field label {

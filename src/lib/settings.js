@@ -3,7 +3,14 @@ const fs = require('fs')
 
 const SETTINGS_FILENAME = 'user_settings.json'
 const SETTINGS = {
-    OPENSONG_FOLDER: "opensong-folder"
+    OPENSONG_FOLDER: {
+        key: "opensong-folder",
+        type: "text"
+    },
+    DISPLAY_MODE: {
+        key: "display-mode",
+        type: "radio"
+    }
 }
 
 let appPaths
@@ -28,25 +35,36 @@ const get = (key) => {
 }
 
 const set = (key, val) => {
-    settings[val] = key
-    fs.writeFileSync(settingsFilePath, JSON.stringify(settings))
+    settings[key] = val
+    fs.writeFileSync(settingsFilePath, JSON.stringify(settings, null, 2))
 }
 
 const setAll = (json) => {
     settings = json
-    fs.writeFileSync(settingsFilePath, JSON.stringify(settings))
+    fs.writeFileSync(settingsFilePath, JSON.stringify(settings, null, 2))
 }
 
 const getPath = (pathKey) => {
     return appPaths[pathKey]
 }
 
+const getSettingDict = () => Object.keys(SETTINGS).reduce((acc, val) => {
+    acc[val] = SETTINGS[val].key
+    return acc
+}, {})
+
+const getKeys = () => Object.keys(SETTINGS).reduce((acc, val) => {
+    acc.push(SETTINGS[val].key)
+    return acc
+}, [])
+
 module.exports = {
     init,
     get,
     set,
     setAll,
-    dict: SETTINGS,
-    keys: Object.values(SETTINGS),
+    dict: getSettingDict(),
+    keys: getKeys(),
+    raw: SETTINGS,
     getPath
 }
