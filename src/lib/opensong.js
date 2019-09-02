@@ -25,6 +25,11 @@ const BASE_CHORDS = [
 ]
 const MAJOR_KEYS = BASE_CHORDS
 const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
+const EXCLUDED_LATEST_SET_KEYWORDS = [
+    'pm',
+    'evening',
+    'night'
+]
 
 let allSets = null
 let songsInSets = {}
@@ -176,8 +181,9 @@ function getMostRecentSetSongWasIn(songName) {
     }
 
     mostRecentSetIndex = allSets.findIndex(set => {
-        // Don't include Sunday night sets in recent sets
-        if (set.name.toLowerCase().includes('pm')) {
+        // Don't include any sets with excluded words in recent sets
+        const setNameLower = set.name.toLowerCase()
+        if (EXCLUDED_LATEST_SET_KEYWORDS.some(word => setNameLower.includes(word))) {
             return false;
         }
 
