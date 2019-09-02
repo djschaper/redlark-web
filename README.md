@@ -1,21 +1,29 @@
 # FBC Redlark
 
-This is a web app for planning and organizing worship sets and songs.
-The NodeJS server is hosted as an AWS ElasticBeanstalk app.
+This is an app for planning and organizing worship sets and songs. It is designed as a web app to allow for easy porting to a web-hosted solution, although currently it is released as a local desktop Electron app.
 
-## Quick Start
-1. Install NodeJS 8.11.3 and NPM (https://nodejs.org/en/)
-1. Install node modules: `npm install`
-1. Install and start MySQL Server (https://dev.mysql.com/downloads/installer/)
-	- Create a local database and set the corresponding `DB_` variables in `.env` file:
-1. Run database migrations: `npm run db:migrate`
-1. Run database seeds: `npm run db:seed`
-1. Start server on localhost (url printed in console): `npm run start:dev`
+## Developing
+To run app locally, use: `npm run start`.
 
-## Database
-The database is interfaced from NodeJS via Sequelize (https://github.com/sequelize/sequelize)
+To have code changes automatically restart app, use: `npm run start:dev`.
 
-### Create New Migration
-1. Create empty migration file: `npm run migration:create {migration-name}`
-   - Example: `npm run migration:create add-users-table`
-1. Remove the `use strict;` at the top of the file and proceed to edit
+## Releases
+Release procedure:
+1. Increment version number in `package.json`
+1. Check in all code changes to GitHub
+1. Build distributable and create draft release on GitHub with: `npm run release`
+1. Write a description of the release, using the following template:
+    ```
+    ## Description
+    A brief description of the release and how it affects users.
+
+    ## Features
+    * Added feature X
+
+    ## Bug Fixes
+    * Fixed bug Y
+
+    ## Supported Platforms
+    * Windows x64, x86
+    ```
+1. Publish the GitHub release. It will be automatically downloaded and installed the next time users open the app.
