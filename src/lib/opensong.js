@@ -25,11 +25,6 @@ const BASE_CHORDS = [
 ]
 const MAJOR_KEYS = BASE_CHORDS
 const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
-const EXCLUDED_LATEST_SET_KEYWORDS = [
-    'pm',
-    'evening',
-    'night'
-]
 
 let allSets = null
 let songsInSets = {}
@@ -167,7 +162,7 @@ function parseSetDate(setName) {
         return null
     }
 
-    const setDate = moment(setName, 'YYYY-MM-DD')
+    const setDate = moment(setName, 'YYYY-MM-DD', true)
     if (!setDate.isValid()) {
         return null
     }
@@ -181,15 +176,15 @@ function getMostRecentSetSongWasIn(songName) {
     }
 
     mostRecentSetIndex = allSets.findIndex(set => {
-        // Don't include any sets with excluded words in recent sets
-        const setNameLower = set.name.toLowerCase()
-        if (EXCLUDED_LATEST_SET_KEYWORDS.some(word => setNameLower.includes(word))) {
+        const setDate = parseSetDate(set.name)
+        
+        // Don't include any sets that don't match required date format
+        if (!setDate) {
             return false;
         }
 
-        const setDate = parseSetDate(set.name)
         // Don't include sets with future dates
-        if (setDate && moment() < setDate) {
+        if (moment() < setDate) {
             return false;
         }
 
