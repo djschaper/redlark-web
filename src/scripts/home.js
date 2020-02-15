@@ -35,6 +35,8 @@ const openSetButton = document.getElementById('open-set-button')
 const newSetButton = document.getElementById('new-set-button')
 const printSetButton = document.getElementById('print-set-button')
 const savePDFSetButton = document.getElementById('pdf-set-button')
+const copySetTableButton = document.getElementById('copy-set-table-button')
+const setTableClipboard = document.getElementById('set-table-clipboard')
 const setList = document.getElementById('set-list')
 const exportSetToolbar = document.getElementById('export-set-tools')
 const darkMode = document.getElementById('dark-mode')
@@ -82,7 +84,7 @@ const getSong = (event) => {
     const songId = song.id.split(SET_ID_PREFIX)[0]
     const key = song.querySelector('.key')
     const isInSet = song.parentElement === setSongList
-    
+
     let queryString = `id=${songId}`
     if (songIdSplit.length > 1) {
         queryString += `&fullid=${song.id}`
@@ -371,7 +373,7 @@ const clearSet = () => {
 }
 newSetButton.addEventListener('click', clearSet)
 
-postSetFile = (print, handler) => {
+const postSetFile = (print, handler) => {
     const songs = getSongsInSet().map(song => ({
         id: song.id.split(SET_ID_PREFIX)[0],
         key: song.querySelector('.key').innerText
@@ -396,8 +398,79 @@ postSetFile = (print, handler) => {
     })
 }
 
+const copySetSongTable = () => {
+    // Reset table
+    setTableClipboard.innerHTML = ''
+
+    // Create headers
+    const headers = ["Order", "Song", "Key"]
+    const headerRow = document.createElement('tr')
+    setTableClipboard.append(headerRow)
+    headers.forEach(text => {
+        const col = document.createElement('th')
+        col.innerText = text
+        headerRow.appendChild(col)
+    })
+
+    // Get YouTube links for songs
+    const songIdToLink = {}
+    setSongList.childNodes.forEach(song => {
+        const songId = song.id.split(SET_ID_PREFIX)[0]
+
+        ajax({
+            method: 'GET',
+            route: `/song?id=${songId}`,
+            type: RESPONSE_TYPES.HTML,
+            handler: (doc) => {
+                const link = doc.querySelector('#youtube-link').href
+                songIdToLink[songId] = link
+
+                // All AJAX calls done
+                if (Object.keys(songIdToLink).length == setSongList.childElementCount) {
+                    // Add song rows
+                    for (i = 0; i < setSongList.childElementCount; i++) {
+                        const finalSong = setSongList.children[i]
+                        const key = finalSong.querySelector(".key").innerText
+                        const title = finalSong.querySelector(".song-title").innerText
+                        const finalSongId = finalSong.id.split(SET_ID_PREFIX)[0]
+
+                        // Last song is 'R' for "reflection"
+                        const order = i == setSongList.childElementCount - 1 ? 'R' : i + 1
+
+                        addTableRow(setTableClipboard, [order, `<a href="${songIdToLink[finalSongId]}">${title}</a>`, key])
+                    }
+
+                    // Copy table to clipboard
+                    copyElement(setTableClipboard)
+                }
+            }
+        })
+    })
+}
+
+const addTableRow = (table, cols) => {
+    row = document.createElement('tr')
+    table.appendChild(row)
+
+    cols.forEach(col => {
+        const td = document.createElement('td')
+        td.innerHTML = col
+        row.appendChild(td)
+    })
+}
+
+const copyElement = (element) => {
+    const selection = window.getSelection()
+    selection.removeAllRanges()
+    const range = document.createRange()
+    range.selectNodeContents(element)
+    selection.addRange(range)
+    document.execCommand("copy")
+}
+
 savePDFSetButton.addEventListener('click', () => postSetFile(false, (res) => downloadLink(res.download, res.name)))
 printSetButton.addEventListener('click', () => postSetFile(true, (html) => printHTML(html)))
+copySetTableButton.addEventListener('click', () => copySetSongTable())
 
 updateExportSetToolbar()
 
