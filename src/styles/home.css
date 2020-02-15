@@ -265,3 +265,61 @@
     padding-top: 10px;
     justify-content: center;
 }
+
+#set-table-clipboard {
+    font-size: small;
+    text-align: center;
+    border-collapse: collapse;
+    color: black;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+
+    #set-table-clipboard td, th {
+        padding: 3px 10px 3px 10px;
+        border-left: 1px solid white;
+        border-right: 1px solid white;
+    }
+
+    #set-table-clipboard th {
+        border: 1px solid white;
+        background-color: #417b9b;
+        color: white;
+    }
+
+    #set-table-clipboard td {
+        border-left: 1px solid white;
+        border-right: 1px solid white;
+    }
+
+    #set-table-clipboard tr:nth-child(even) {
+        background-color: #e9f7ff;
+    }
+
+    #set-table-clipboard td:nth-child(2) {
+        text-align: left;
+    }
+
+    #set-table-clipboard th:first-child {
+        border-top-left-radius: 5px;
+    }
+
+    #set-table-clipboard th:last-child {
+        border-top-right-radius: 5px;
+    }
+
+    #set-table-clipboard tr:last-child td:first-child {
+        border-bottom-left-radius: 5px;
+    }
+
+    #set-table-clipboard tr:last-child td:last-child {
+        border-bottom-right-radius: 5px;
+    }
+
+    #set-table-clipboard a {
+        text-decoration: underline;
+        color: #185c81;
+    }
