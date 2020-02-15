@@ -30,7 +30,7 @@
     "opn": "^5.4.0",
     "password-hash": "^1.2.2",
     "puppeteer": "^1.16.0",
-    "sequelize": "^4.38.0",
+    "sequelize": "^5.15.1",
     "sequelize-cli": "^4.0.0",
     "sortablejs": "^1.9.0",
     "uuid": "^3.3.2"
