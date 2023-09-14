@@ -11,7 +11,8 @@ To have code changes automatically restart app, use: `npm run start:dev`.
 Release procedure:
 1. Increment version number in `package.json`
 1. Check in all code changes to GitHub
-1. Build distributable and create draft release on GitHub with: `npm run release`
+1. Build distributable and create draft release on GitHub with: `npm run release`.
+NOTE: Ensure `GH_TOKEN` environment variable is set to a valid GitHub personal access token (PAT).
 1. Write a description of the release, using the following template:
     ```
     ## Description
