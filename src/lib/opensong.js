@@ -25,6 +25,15 @@ const BASE_CHORDS = [
 ]
 const MAJOR_KEYS = BASE_CHORDS
 const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
+const SECTION_ABBREV_TO_TITLES = {
+    'I': 'Intro',
+    'V': 'Verse',
+    'P': 'Pre-Chorus',
+    'C': 'Chorus',
+    'B': 'Bridge',
+    'E': 'Ending',
+    'T': 'Tag',
+}
 
 let allSets = null
 let songsInSets = {}
@@ -432,13 +441,7 @@ function generateHTML(openSongFile, options = {}) {
             const sectionTitle = sections.slice(1)
 
             // Replace shorthand if present
-            if (sectionTitle[0] == 'V') {
-                sectionTitle[0] = 'Verse'
-            } else if (sectionTitle[0] == 'C') {
-                sectionTitle[0] = 'Chorus'
-            } else if (sectionTitle[0] == 'B') {
-                sectionTitle[0] = 'Bridge'
-            }
+            sectionTitle[0] = SECTION_ABBREV_TO_TITLES[sectionTitle[0]] || sectionTitle[0]
 
             // Add new section to HTML
             currentSection = sectionTitle.join('-').replace(/\s/g, '').replace(/\//g, '-').toLowerCase()
