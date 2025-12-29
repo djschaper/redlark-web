@@ -243,7 +243,7 @@ function getTranspositionChange(key, targetKey) {
 }
 
 function getBaseChord(chord) {
-    const baseChordRegex = /([A-G,b,#]+)/g
+    const baseChordRegex = /^[\()]*([A-G][b,#]*)/g
     const matches = baseChordRegex.exec(chord)
     if (matches == null || matches.length < 2) {
         if (!chord.includes('|')) {
