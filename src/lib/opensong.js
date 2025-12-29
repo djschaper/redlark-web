@@ -34,6 +34,7 @@ const SECTION_ABBREV_TO_TITLES = {
     'E': 'Ending',
     'T': 'Tag',
 }
+const COMMENT_REGEX = /(\([^\)]+\))/gm;
 
 let allSets = null
 let songsInSets = {}
@@ -409,6 +410,10 @@ function generateHTML(openSongFile, options = {}) {
             // Default pad chords with 2 spaces
             chord += '  '
         }
+
+        // Add extra wrapping around comments in the lyrics, denoted by parentheses
+        lyric = lyric.replace(COMMENT_REGEX, '<comment>$1</comment>');
+
         $('#' + currentSection).children().last().append('<span class="chord-lyric"><chord>' + chord + '</chord><lyric>' + lyric + '</lyric></span>')
     }
 
