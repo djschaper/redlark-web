@@ -32,6 +32,7 @@ const SECTION_ABBREV_TO_TITLES = {
     'C': 'Chorus',
     'B': 'Bridge',
     'E': 'Ending',
+    'O': 'Outro',
     'T': 'Tag',
 }
 const COMMENT_REGEX = /(\([^\)]+\))/gm;
@@ -243,7 +244,7 @@ function getTranspositionChange(key, targetKey) {
 }
 
 function getBaseChord(chord) {
-    const baseChordRegex = /^[\()]*([A-G][b,#]*)/g
+    const baseChordRegex = /^\W*([A-G][b,#]*)/g
     const matches = baseChordRegex.exec(chord)
     if (matches == null || matches.length < 2) {
         if (!chord.includes('|')) {
