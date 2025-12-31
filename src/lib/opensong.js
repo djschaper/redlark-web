@@ -110,7 +110,7 @@ function getAllSongNamesAndIds() {
         console.log(`OpenSong Songs folder "${openSongFolder}" does not exist`)
     }
 
-    files = files.filter(file => file.indexOf('.') < 0)
+    files = files.filter(file => file.indexOf('.') < 0 && fs.statSync(path.join(openSongFolder, file)).isFile())
 
     let songs = []
     files.reduce((acc, val) => {
