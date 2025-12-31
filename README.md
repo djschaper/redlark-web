@@ -3,6 +3,8 @@
 This is an app for planning and organizing worship sets and songs. It is designed as a web app to allow for easy porting to a web-hosted solution, although currently it is released as a local desktop Electron app.
 
 ## Developing
+Using Node 11.15.0.
+
 To run app locally, use: `npm run start`.
 
 To have code changes automatically restart app, use: `npm run start:dev`.
