@@ -251,7 +251,9 @@
             font-weight: bold;
         }
 
-        lyric {
+        comment {
+            font-style: italic;
+            font-size: small;
         }
     </style>
 </head>
@@ -328,11 +330,12 @@
         ]
         const MAJOR_KEYS = BASE_CHORDS
         const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
+        const KEY_LABEL_PREFIX = "Key - "
 
         // Functions ////////////////////////////////////////////////////////////////////
         function transposeSong(targetKey) {
             const currentKeyObj = document.getElementsByTagName('key')[0]
-            const change = getTranspositionChange(currentKeyObj.innerText, targetKey)
+            const change = getTranspositionChange(currentKeyObj.innerText.replace(KEY_LABEL_PREFIX, ""), targetKey)
 
             // Change all chords in song body
             const chords = document.getElementsByTagName('chord')
@@ -344,7 +347,7 @@
                 chords[i].innerText = transposeChord(chords[i].innerText, change)
             }
             // Change 'Key' in song overview
-            currentKeyObj.innerText = "Key - " + targetKey
+            currentKeyObj.innerText = KEY_LABEL_PREFIX + targetKey
         }
 
         // Listeners ///////////////////////////////////////////////////////////////////////

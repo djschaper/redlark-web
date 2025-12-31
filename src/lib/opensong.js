@@ -25,6 +25,16 @@ const BASE_CHORDS = [
 ]
 const MAJOR_KEYS = BASE_CHORDS
 const MINOR_KEYS = BASE_CHORDS.map(key => key + 'm')
+const SECTION_ABBREV_TO_TITLES = {
+    'I': 'Intro',
+    'V': 'Verse',
+    'P': 'Pre-Chorus',
+    'C': 'Chorus',
+    'B': 'Bridge',
+    'E': 'Ending',
+    'T': 'Tag',
+}
+const COMMENT_REGEX = /(\([^\)]+\))/gm;
 
 let allSets = null
 let songsInSets = {}
@@ -100,7 +110,7 @@ function getAllSongNamesAndIds() {
         console.log(`OpenSong Songs folder "${openSongFolder}" does not exist`)
     }
 
-    files = files.filter(file => file.indexOf('.') < 0)
+    files = files.filter(file => file.indexOf('.') < 0 && fs.statSync(path.join(openSongFolder, file)).isFile())
 
     let songs = []
     files.reduce((acc, val) => {
@@ -233,7 +243,7 @@ function getTranspositionChange(key, targetKey) {
 }
 
 function getBaseChord(chord) {
-    const baseChordRegex = /([A-G,b,#]+)/g
+    const baseChordRegex = /^[\()]*([A-G][b,#]*)/g
     const matches = baseChordRegex.exec(chord)
     if (matches == null || matches.length < 2) {
         if (!chord.includes('|')) {
@@ -400,6 +410,10 @@ function generateHTML(openSongFile, options = {}) {
             // Default pad chords with 2 spaces
             chord += '  '
         }
+
+        // Add extra wrapping around comments in the lyrics, denoted by parentheses
+        lyric = lyric.replace(COMMENT_REGEX, '<comment>$1</comment>');
+
         $('#' + currentSection).children().last().append('<span class="chord-lyric"><chord>' + chord + '</chord><lyric>' + lyric + '</lyric></span>')
     }
 
@@ -417,7 +431,7 @@ function generateHTML(openSongFile, options = {}) {
         // Section title line
         if (line[0] == '[') {
             // Break section up into section type and number
-            let sections = /\[(\D+)(\d+)\]/g.exec(line)
+            let sections = /\[(\D+)(\d+[a-f]*)\]/g.exec(line)
             if (sections == null) {
                 sections = /\[(\D+)\]/g.exec(line)
             }
@@ -432,13 +446,7 @@ function generateHTML(openSongFile, options = {}) {
             const sectionTitle = sections.slice(1)
 
             // Replace shorthand if present
-            if (sectionTitle[0] == 'V') {
-                sectionTitle[0] = 'Verse'
-            } else if (sectionTitle[0] == 'C') {
-                sectionTitle[0] = 'Chorus'
-            } else if (sectionTitle[0] == 'B') {
-                sectionTitle[0] = 'Bridge'
-            }
+            sectionTitle[0] = SECTION_ABBREV_TO_TITLES[sectionTitle[0]] || sectionTitle[0]
 
             // Add new section to HTML
             currentSection = sectionTitle.join('-').replace(/\s/g, '').replace(/\//g, '-').toLowerCase()
