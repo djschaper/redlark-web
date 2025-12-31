@@ -1,4 +1,4 @@
-# FBC Redlark
+# Redlark
 
 This is an app for planning and organizing worship sets and songs. It is designed as a web app to allow for easy porting to a web-hosted solution, although currently it is released as a local desktop Electron app.
 
