@@ -431,7 +431,7 @@ function generateHTML(openSongFile, options = {}) {
         // Section title line
         if (line[0] == '[') {
             // Break section up into section type and number
-            let sections = /\[(\D+)(\d+)\]/g.exec(line)
+            let sections = /\[(\D+)(\d+[a-f]*)\]/g.exec(line)
             if (sections == null) {
                 sections = /\[(\D+)\]/g.exec(line)
             }
