@@ -34,6 +34,7 @@ const handler = (request, reply) => {
     const $ = cheerio.load(template, { xmlMode: true })
     const songsParent = $('slide_groups')
     const blankSong = $('slide_group')
+    blankSong.attr('path', settings.get(settings.dict.OPENSONG_SUBFOLDER) || '/')
     for (let song of songs) {
         const songElement = blankSong.clone()
         songElement.attr('name', opensong.getNameFromId(song.id))

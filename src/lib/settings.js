@@ -7,6 +7,10 @@ const SETTINGS = {
         key: "opensong-folder",
         type: "text"
     },
+    OPENSONG_SUBFOLDER: {
+        key: "opensong-subfolder",
+        type: "text",
+    },
     DISPLAY_MODE: {
         key: "display-mode",
         type: "radio"
