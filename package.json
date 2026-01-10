@@ -1,6 +1,6 @@
 {
   "name": "redlark",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "appId": "com.schaper.redlark",
   "private": true,
   "main": "src/app.js",
