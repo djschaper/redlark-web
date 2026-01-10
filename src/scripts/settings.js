@@ -8,3 +8,19 @@ openSongFolderBrowser.addEventListener('change', (event) => {
     }
     openSongFolder.value = openSongFolderBrowser.files[0].path
 })
+
+const openSongSubfolder = document.getElementById('opensong-subfolder')
+
+openSongSubfolder.addEventListener('change', (event) => {
+    if (openSongSubfolder == null) {
+        openSongSubfolder = '/'
+    }
+
+    if (!openSongSubfolder.value.endsWith('/')) {
+        openSongSubfolder.value += '/'
+    }
+
+    if (!openSongSubfolder.value.startsWith('/')) {
+        openSongSubfolder.value = '/' + openSongSubfolder.value
+    }
+})
