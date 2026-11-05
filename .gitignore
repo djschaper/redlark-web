@@ -7,7 +7,8 @@ meh
 credentials.json
 certs
 test-certs
-dist__pycache__/
+dist
+__pycache__/
 *.pyc
 .venv/
 .pytest_cache/
