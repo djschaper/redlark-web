@@ -44,8 +44,20 @@ _META = {
     "capo": "capo",
 }
 _KNOWN_SECTION_WORDS = (
-    "verse", "chorus", "pre-chorus", "prechorus", "bridge", "intro", "outro", "ending", "tag",
-    "instrumental", "interlude", "turnaround", "refrain", "coda",
+    "verse",
+    "chorus",
+    "pre-chorus",
+    "prechorus",
+    "bridge",
+    "intro",
+    "outro",
+    "ending",
+    "tag",
+    "instrumental",
+    "interlude",
+    "turnaround",
+    "refrain",
+    "coda",
 )
 
 
@@ -193,8 +205,14 @@ def song_to_chordpro(song: Song) -> str:
     out = [f"{{title: {song.title}}}"]
     if song.author:
         out.append(f"{{artist: {song.author}}}")
-    for directive, attr in (("key", "key"), ("tempo", "tempo"), ("time", "time_sig"), ("capo", "capo"),
-                            ("ccli", "ccli"), ("copyright", "copyright")):
+    for directive, attr in (
+        ("key", "key"),
+        ("tempo", "tempo"),
+        ("time", "time_sig"),
+        ("capo", "capo"),
+        ("ccli", "ccli"),
+        ("copyright", "copyright"),
+    ):
         val = getattr(song, attr)
         if val:
             out.append(f"{{{directive}: {val}}}")

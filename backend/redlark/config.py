@@ -12,12 +12,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def user_data_dir() -> Path:
+    # Not "Redlark": on Windows that is the same folder as v1 Electron's userData ("redlark").
     if sys.platform == "win32":
         base = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
-        return base / "Redlark"
+        return base / "RedlarkV2"
     if sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / "Redlark"
-    return Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "redlark"
+        return Path.home() / "Library" / "Application Support" / "RedlarkV2"
+    return Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "redlark-v2"
 
 
 class Settings(BaseSettings):

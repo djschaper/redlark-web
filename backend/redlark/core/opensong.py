@@ -47,10 +47,40 @@ _FIELD_MAP = {
 }
 # Field order used when writing a song that didn't come from an OpenSong file.
 _DEFAULT_ORDER = [
-    "uuid", "last_modified", "title", "author", "copyright", "presentation", "hymn_number", "capo",
-    "tempo", "time_sig", "duration", "predelay", "ccli", "theme", "alttheme", "user1", "user2", "user3",
-    "key", "keyoriginal", "aka", "midi", "midi_index", "notes", "lyrics", "pad_file", "custom_chords",
-    "link_youtube", "link_web", "link_audio", "loop_audio", "link_other", "abcnotation", "abctranspose",
+    "uuid",
+    "last_modified",
+    "title",
+    "author",
+    "copyright",
+    "presentation",
+    "hymn_number",
+    "capo",
+    "tempo",
+    "time_sig",
+    "duration",
+    "predelay",
+    "ccli",
+    "theme",
+    "alttheme",
+    "user1",
+    "user2",
+    "user3",
+    "key",
+    "keyoriginal",
+    "aka",
+    "midi",
+    "midi_index",
+    "notes",
+    "lyrics",
+    "pad_file",
+    "custom_chords",
+    "link_youtube",
+    "link_web",
+    "link_audio",
+    "loop_audio",
+    "link_other",
+    "abcnotation",
+    "abctranspose",
 ]
 UUID_NAMESPACE = uuidlib.UUID("5b0c6f0e-6b8b-4f7c-9a57-8a1f4f0f9e11")
 
@@ -155,11 +185,7 @@ def _split_chord_line(chord_line: str, lyric_line: str) -> list[Segment]:
             while end < len(lyric_line) and lyric_line[end] == " " and (nxt is None or end < nxt):
                 end += 1
         else:
-            while (
-                end < len(lyric_line)
-                and lyric_line[end] not in " -"
-                and (nxt is None or end < nxt)
-            ):
+            while end < len(lyric_line) and lyric_line[end] not in " -" and (nxt is None or end < nxt):
                 end += 1
         add("", lyric_line[last:start])
         add(chord, lyric_line[start:end])
@@ -265,7 +291,13 @@ def transpose_sections(sections: list[Section], change: int) -> list[Section]:
             s.code,
             s.kind,
             s.label,
-            [Line([Segment(transpose_chord(g.chord, change) if g.chord else "", g.lyric) for g in ln.segments], ln.kind) for ln in s.lines],
+            [
+                Line(
+                    [Segment(transpose_chord(g.chord, change) if g.chord else "", g.lyric) for g in ln.segments],
+                    ln.kind,
+                )
+                for ln in s.lines
+            ],
         )
         for s in sections
     ]

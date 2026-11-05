@@ -197,7 +197,10 @@ def apply(library_id: str, data: ApplyIn, ctx: AppContext = Depends(get_ctx)):
     if data.direction != "both":
         keep = "push" if data.direction == "push" else "pull"
         plan = SyncPlan(
-            [e if e.action in (keep, "conflict") else SyncEntry(**{**asdict(e), "action": "same"}) for e in plan.entries]
+            [
+                e if e.action in (keep, "conflict") else SyncEntry(**{**asdict(e), "action": "same"})
+                for e in plan.entries
+            ]
         )
     started = now_iso()
     try:

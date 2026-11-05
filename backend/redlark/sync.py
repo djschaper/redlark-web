@@ -77,7 +77,9 @@ class RemoteStore:
 
     def get_set(self, set_id: str) -> SongSet:
         data = self._get(f"/sets/{set_id}")
-        return SongSet(name=data["name"], last_modified=data["last_modified"], items=[SetItem(**i) for i in data["items"]])
+        return SongSet(
+            name=data["name"], last_modified=data["last_modified"], items=[SetItem(**i) for i in data["items"]]
+        )
 
     def save_set(self, song_set: SongSet) -> str:
         r = self.client.put(self.base + "/sets", json=asdict(song_set))
@@ -120,8 +122,16 @@ def plan_sync(local: LibraryStore, remote: RemoteStore, last_sync: str = "") -> 
         else:
             action = decide(ls.last_modified, rs.last_modified)  # type: ignore[union-attr]
         plan.entries.append(
-            SyncEntry(f"song:{uuid}", "song", title, action, ls.id if ls else None, rs.id if rs else None,
-                      ls.last_modified if ls else "", rs.last_modified if rs else "")
+            SyncEntry(
+                f"song:{uuid}",
+                "song",
+                title,
+                action,
+                ls.id if ls else None,
+                rs.id if rs else None,
+                ls.last_modified if ls else "",
+                rs.last_modified if rs else "",
+            )
         )
 
     l_sets = {s.name: s for s in local.list_sets()}
@@ -135,8 +145,16 @@ def plan_sync(local: LibraryStore, remote: RemoteStore, last_sync: str = "") -> 
         else:
             action = decide(ls.last_modified, rs.last_modified)  # type: ignore[union-attr]
         plan.entries.append(
-            SyncEntry(f"set:{name}", "set", name, action, ls.id if ls else None, rs.id if rs else None,
-                      ls.last_modified if ls else "", rs.last_modified if rs else "")
+            SyncEntry(
+                f"set:{name}",
+                "set",
+                name,
+                action,
+                ls.id if ls else None,
+                rs.id if rs else None,
+                ls.last_modified if ls else "",
+                rs.last_modified if rs else "",
+            )
         )
     return plan
 

@@ -11,13 +11,28 @@ from ..db.models import Library, SetItemRow, SetRow, SongRow
 from .base import NotFound, SetSummary, SongSummary
 
 _SONG_COLS = (
-    "title", "author", "copyright", "ccli", "key", "tempo", "time_sig", "capo", "link_youtube", "notes",
-    "lyrics", "uuid", "last_modified", "extra", "field_order",
+    "title",
+    "author",
+    "copyright",
+    "ccli",
+    "key",
+    "tempo",
+    "time_sig",
+    "capo",
+    "link_youtube",
+    "notes",
+    "lyrics",
+    "uuid",
+    "last_modified",
+    "extra",
+    "field_order",
 )
 
 
 def row_to_song(row: SongRow) -> Song:
-    return Song(**{c: (getattr(row, c) or ({} if c == "extra" else [] if c == "field_order" else "")) for c in _SONG_COLS})
+    return Song(
+        **{c: (getattr(row, c) or ({} if c == "extra" else [] if c == "field_order" else "")) for c in _SONG_COLS}
+    )
 
 
 class SqlStore:
@@ -123,7 +138,9 @@ class SqlStore:
                 if it.song_id:
                     song = db.get(SongRow, it.song_id)
                     name = song.title if song else name
-                items.append(SetItem(name=name, key=it.key, type=it.type, song_id=it.song_id or "", attrs=it.attrs or {}))
+                items.append(
+                    SetItem(name=name, key=it.key, type=it.type, song_id=it.song_id or "", attrs=it.attrs or {})
+                )
             return SongSet(name=row.name, items=items, last_modified=row.last_modified)
 
     def save_set(self, song_set: SongSet, set_id: str | None = None, *, keep_timestamp: bool = False) -> str:
@@ -147,7 +164,9 @@ class SqlStore:
                 if song_id and (s := db.get(SongRow, song_id)) is not None and s.library_id != self.library_id:
                     song_id = None
                 row.items.append(
-                    SetItemRow(position=pos, song_id=song_id, name=item.name, key=item.key, type=item.type, attrs=item.attrs)
+                    SetItemRow(
+                        position=pos, song_id=song_id, name=item.name, key=item.key, type=item.type, attrs=item.attrs
+                    )
                 )
             db.commit()
             return row.id

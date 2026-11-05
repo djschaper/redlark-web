@@ -30,9 +30,7 @@ def _template(path: str, mtime: float) -> str:
 def viewer_template() -> str:
     path = static_dir() / "standalone.html"
     if not path.exists():
-        raise FileNotFoundError(
-            f"{path} is missing. Build the frontend first: `npm run build` in frontend/."
-        )
+        raise FileNotFoundError(f"{path} is missing. Build the frontend first: `npm run build` in frontend/.")
     return _template(str(path), path.stat().st_mtime)
 
 

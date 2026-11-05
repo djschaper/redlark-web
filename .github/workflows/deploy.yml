@@ -1,0 +1,34 @@
+name: Deploy to AWS
+
+# Builds the Docker image, pushes it to ECR, and (if configured) triggers an App Runner deploy.
+# Required repository settings:
+#   secrets.AWS_ROLE_ARN  - IAM role GitHub can assume via OIDC (ECR push + apprunner:StartDeployment)
+#   vars.AWS_REGION       - e.g. ca-central-1
+#   vars.ECR_REPOSITORY   - e.g. redlark
+#   vars.APPRUNNER_SERVICE_ARN (optional)
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push
+        run: |
+          IMAGE=${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}
+          docker build -t $IMAGE:${{ github.sha }} -t $IMAGE:latest .
+          docker push --all-tags $IMAGE
+      - name: Deploy App Runner
+        if: vars.APPRUNNER_SERVICE_ARN != ''
+        run: aws apprunner start-deployment --service-arn ${{ vars.APPRUNNER_SERVICE_ARN }}

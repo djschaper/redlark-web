@@ -15,3 +15,6 @@ dist__pycache__/
 backend/redlark/static/
 build/pyinstaller/
 *.db
+.claude/launch.json
+.devdata/
+backend/dist/

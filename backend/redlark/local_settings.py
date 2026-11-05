@@ -49,28 +49,33 @@ class LocalSettingsStore:
                 except ValueError:
                     pass
             settings = LocalSettings()
-            self._import_v1(settings)
+            if self._import_v1(settings):
+                # Persist straight away so the imported library keeps a stable id.
+                self._write(settings)
             return settings
 
     def save(self, settings: LocalSettings) -> None:
         with self._lock:
-            self.data_dir.mkdir(parents=True, exist_ok=True)
-            tmp = self.path.with_suffix(".tmp")
-            tmp.write_text(settings.model_dump_json(indent=2), encoding="utf-8")
-            tmp.replace(self.path)
+            self._write(settings)
 
-    def _import_v1(self, settings: LocalSettings) -> None:
+    def _write(self, settings: LocalSettings) -> None:
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        tmp = self.path.with_suffix(".tmp")
+        tmp.write_text(settings.model_dump_json(indent=2), encoding="utf-8")
+        tmp.replace(self.path)
+
+    def _import_v1(self, settings: LocalSettings) -> bool:
         """Pick up the OpenSong folder and dark mode from Redlark v1's user_settings.json."""
         appdata = os.environ.get("APPDATA")
-        if not appdata:
-            return
+        if not appdata or os.environ.get("REDLARK_SKIP_V1_IMPORT"):
+            return False
         v1 = Path(appdata) / "redlark" / "user_settings.json"
         if not v1.exists():
-            return
+            return False
         try:
             old = json.loads(v1.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            return
+            return False
         folder = old.get("opensong-folder")
         if folder and folder != "undefined":
             lib = LocalLibrary(
@@ -83,3 +88,4 @@ class LocalSettingsStore:
             settings.active_library = lib.id
         if old.get("display-mode") == "dark":
             settings.display_mode = "dark"
+        return True

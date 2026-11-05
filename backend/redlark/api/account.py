@@ -180,7 +180,9 @@ def _owner(ctx: AppContext, user: User | None, library_id: str) -> None:
 
 
 @router.patch("/libraries/{library_id}")
-def update_library(library_id: str, data: LibraryPatch, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)):
+def update_library(
+    library_id: str, data: LibraryPatch, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)
+):
     _owner(ctx, user, library_id)
     if ctx.mode == "local":
         assert ctx.local
@@ -242,13 +244,18 @@ def list_members(library_id: str, ctx: AppContext = Depends(get_ctx), user: User
         if membership_role(db, user, library_id) is None:
             raise HTTPException(404, "Library not found")
         rows = db.execute(
-            select(User, Membership.role).join(Membership).where(Membership.library_id == library_id).order_by(User.email)
+            select(User, Membership.role)
+            .join(Membership)
+            .where(Membership.library_id == library_id)
+            .order_by(User.email)
         ).all()
         return [{**_user_out(u), "role": role} for u, role in rows]
 
 
 @router.post("/libraries/{library_id}/members", status_code=201)
-def add_member(library_id: str, data: MemberIn, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)):
+def add_member(
+    library_id: str, data: MemberIn, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)
+):
     _server_only(ctx)
     _owner(ctx, user, library_id)
     assert ctx.sessions
@@ -271,7 +278,9 @@ def add_member(library_id: str, data: MemberIn, ctx: AppContext = Depends(get_ct
 
 
 @router.delete("/libraries/{library_id}/members/{user_id}", status_code=204)
-def remove_member(library_id: str, user_id: str, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)):
+def remove_member(
+    library_id: str, user_id: str, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)
+):
     _server_only(ctx)
     _owner(ctx, user, library_id)
     assert ctx.sessions
@@ -326,3 +335,26 @@ def patch_local_settings(data: SettingsPatch, ctx: AppContext = Depends(get_ctx)
 
 
 ROLES_ORDER = ROLES
+
+
+# ---------------------------------------------------------------- conversion (song editor)
+
+
+class ConvertIn(BaseModel):
+    text: str
+    to: Literal["opensong", "chordpro"]
+
+
+@router.post("/convert")
+def convert(data: ConvertIn):
+    """Convert a song body between OpenSong lyrics text and ChordPro (for the editor's format toggle)."""
+    from ..core.chordpro import parse_chordpro, song_to_chordpro
+    from ..core.model import Song
+    from ..core.opensong import parse_lyrics, sections_to_lyrics
+
+    if data.to == "chordpro":
+        cho = song_to_chordpro(Song(lyrics=sections_to_lyrics(parse_lyrics(data.text))))
+        # Drop the {title: } line the exporter always writes; metadata lives in the form fields.
+        body = "\n".join(line for line in cho.splitlines() if not line.startswith("{title:"))
+        return {"text": body.strip() + "\n"}
+    return {"text": parse_chordpro(data.text).lyrics}

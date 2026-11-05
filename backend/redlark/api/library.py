@@ -230,6 +230,7 @@ class ExportRequest(BaseModel):
     name: str = ""
     combine: bool = True  # PDF/HTML: one document instead of a zip of files
     numbered: bool = False
+    print_layout: bool = False  # HTML: lay out for printing (no toolbar), used by the Print buttons
 
 
 @router.post("/export")
@@ -239,19 +240,40 @@ def export(req: ExportRequest, access: LibraryAccess = Depends(library_access)):
         if req.all:
             if req.format not in ("opensong", "chordpro"):
                 items = [ExportItem(s.id) for s in store.list_songs()]
-                f = export_songs(store, items, req.format, mode=req.mode, combine=req.combine, name=req.name or "Library")
+                f = export_songs(
+                    store,
+                    items,
+                    req.format,
+                    mode=req.mode,
+                    combine=req.combine,
+                    name=req.name or "Library",
+                    print_layout=req.print_layout,
+                )
             else:
                 f = export_library(store, req.format, name=req.name or "Library")
         elif req.set_id:
-            f = export_set(store, store.get_set(req.set_id), req.format, mode=req.mode, combine=req.combine)
+            f = export_set(
+                store,
+                store.get_set(req.set_id),
+                req.format,
+                mode=req.mode,
+                combine=req.combine,
+                print_layout=req.print_layout,
+            )
         elif req.items:
             items = [ExportItem(i.song_id, i.key) for i in req.items]
             if req.format == "opensong" and req.name and req.numbered:
                 f = export_set(store, _set_from(store, SetIn(name=req.name, items=req.items)), "opensong")
             else:
                 f = export_songs(
-                    store, items, req.format, mode=req.mode, combine=req.combine,
-                    name=req.name or "Songs", numbered=req.numbered,
+                    store,
+                    items,
+                    req.format,
+                    mode=req.mode,
+                    combine=req.combine,
+                    name=req.name or "Songs",
+                    numbered=req.numbered,
+                    print_layout=req.print_layout,
                 )
         else:
             raise HTTPException(400, "Nothing selected to export")

@@ -52,7 +52,9 @@ class LibraryAccess:
             raise HTTPException(403, f"This needs {role} access to the library")
 
 
-def library_access(library_id: str, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)) -> LibraryAccess:
+def library_access(
+    library_id: str, ctx: AppContext = Depends(get_ctx), user: User | None = Depends(current_user)
+) -> LibraryAccess:
     found = ctx.store_for(library_id, user)
     if found is None:
         raise HTTPException(404, "Library not found")

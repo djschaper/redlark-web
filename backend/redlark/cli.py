@@ -38,13 +38,18 @@ def version() -> None:
 def serve(
     host: str = typer.Option("127.0.0.1", help="Interface to bind."),
     port: int = typer.Option(8000, help="Port."),
-    mode: str = typer.Option(None, help="'server' (hosted, with accounts) or 'local' (no auth). Default: REDLARK_MODE."),
+    mode: str = typer.Option(
+        None, help="'server' (hosted, with accounts) or 'local' (no auth). Default: REDLARK_MODE."
+    ),
     library: Path | None = typer.Option(None, help="Local mode: add/select this OpenSong folder as a library."),
     reload: bool = typer.Option(False, help="Auto-reload on code changes (development)."),
+    data_dir: Path | None = typer.Option(None, help="Local mode: settings folder (default: per-user app data)."),
 ) -> None:
     """Run the web app."""
     import uvicorn
 
+    if data_dir:
+        os.environ["REDLARK_DATA_DIR"] = str(data_dir)
     if mode:
         os.environ["REDLARK_MODE"] = mode
     if library:
@@ -69,8 +74,13 @@ def _register_local_library(path: Path) -> None:
 
 
 @app.command()
-def desktop(port: int = typer.Option(0, help="Local port (0 = pick a free one).")) -> None:
+def desktop(
+    port: int = typer.Option(0, help="Local port (0 = pick a free one)."),
+    data_dir: Path | None = typer.Option(None, help="Settings folder (default: per-user app data)."),
+) -> None:
     """Open the desktop app window."""
+    if data_dir:
+        os.environ["REDLARK_DATA_DIR"] = str(data_dir)
     from .desktop import run
 
     run(port=port)
@@ -108,8 +118,14 @@ def export_cmd(
     elif format in ("opensong", "chordpro"):
         f = export_library(store, format, name=library.name)  # type: ignore[arg-type]
     else:
-        f = export_songs(store, [ExportItem(s.id) for s in store.list_songs()], format, mode=mode,  # type: ignore[arg-type]
-                         combine=combine, name=library.name)
+        f = export_songs(
+            store,
+            [ExportItem(s.id) for s in store.list_songs()],
+            format,
+            mode=mode,  # type: ignore[arg-type]
+            combine=combine,
+            name=library.name,
+        )
 
     if f.filename.endswith(".zip") and (out.is_dir() or not out.suffix):
         out.mkdir(parents=True, exist_ok=True)

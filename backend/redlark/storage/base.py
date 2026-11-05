@@ -62,9 +62,7 @@ class Recency:
 def song_recency(store: LibraryStore, today: date | None = None) -> dict[str, Recency]:
     """For each song id, the most recent past dated set it appeared in (v1 'recent' dot)."""
     today = today or date.today()
-    dated = [
-        s for s in store.list_sets() if (d := parse_set_date(s.name)) is not None and d <= today
-    ]
+    dated = [s for s in store.list_sets() if (d := parse_set_date(s.name)) is not None and d <= today]
     dated.sort(key=lambda s: s.name, reverse=True)
     result: dict[str, Recency] = {}
     for idx, summary in enumerate(dated):

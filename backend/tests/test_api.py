@@ -56,7 +56,19 @@ def test_edit_song_keeps_untouched_lyrics(local_client):
     c, lib = local_client, local_client.lib
     sid = c.get(f"/api/libraries/{lib}/songs").json()[0]["id"]
     song = c.get(f"/api/libraries/{lib}/songs/{sid}").json()
-    fields = ("title", "author", "copyright", "ccli", "key", "tempo", "time_sig", "capo", "link_youtube", "notes", "lyrics")
+    fields = (
+        "title",
+        "author",
+        "copyright",
+        "ccli",
+        "key",
+        "tempo",
+        "time_sig",
+        "capo",
+        "link_youtube",
+        "notes",
+        "lyrics",
+    )
     body = {k: song[k] for k in fields}
     body["tempo"] = "75"
     r = c.put(f"/api/libraries/{lib}/songs/{sid}", json=body)
@@ -92,9 +104,13 @@ def test_server_auth_and_roles(tmp_path):
     assert r.status_code == 201
     lib = owner.get("/api/libraries").json()[0]
     assert lib["name"] == "Church" and lib["role"] == "owner"
-    r = owner.post(f"/api/libraries/{lib['id']}/songs", json={"title": "Test", "key": "G", "lyrics": "[V1]\n.G\n Hello"})
+    r = owner.post(
+        f"/api/libraries/{lib['id']}/songs", json={"title": "Test", "key": "G", "lyrics": "[V1]\n.G\n Hello"}
+    )
     assert r.status_code == 201
-    owner.post(f"/api/libraries/{lib['id']}/members", json={"email": "b@x.org", "password": "password2", "role": "viewer"})
+    owner.post(
+        f"/api/libraries/{lib['id']}/members", json={"email": "b@x.org", "password": "password2", "role": "viewer"}
+    )
 
     viewer = TestClient(app)
     assert viewer.post("/api/auth/login", json={"email": "b@x.org", "password": "password2"}).status_code == 200

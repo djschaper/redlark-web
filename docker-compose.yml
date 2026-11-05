@@ -1,0 +1,28 @@
+# Local stand-in for the hosted setup:  docker compose up --build  ->  http://localhost:8000
+# Create the first account:  docker compose exec app uv run --no-sync redlark create-user you@example.org --library "My Church"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: redlark
+      POSTGRES_PASSWORD: redlark
+      POSTGRES_DB: redlark
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redlark"]
+      interval: 2s
+      retries: 20
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      REDLARK_DATABASE_URL: postgresql+psycopg://redlark:redlark@db:5432/redlark
+      REDLARK_COOKIE_SECURE: "false"
+      REDLARK_ALLOW_SIGNUP: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  pgdata:

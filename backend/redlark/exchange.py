@@ -70,6 +70,7 @@ def export_songs(
     combine: bool = True,
     name: str = "Songs",
     numbered: bool = False,
+    print_layout: bool = False,
 ) -> ExportFile:
     """Export one or many songs. Many songs become a zip unless ``combine`` (PDF/HTML only)."""
     from .render.pdf import html_to_pdf
@@ -81,7 +82,7 @@ def export_songs(
 
     if fmt in ("pdf", "html") and (single or combine):
         title = store.get_song(items[0].song_id).title if single else name
-        doc = _render_doc(store, items, title, mode, print_mode=(fmt == "pdf"))
+        doc = _render_doc(store, items, title, mode, print_mode=(fmt == "pdf" or print_layout))
         if single:
             song = store.get_song(items[0].song_id)
             title = safe_filename(song.title) + _key_suffix(song, items[0].key)
@@ -119,7 +120,15 @@ def export_songs(
     return _zip(files, safe_filename(name))
 
 
-def export_set(store: LibraryStore, song_set: SongSet, fmt: Format, *, mode: Mode = "chords", combine: bool = True) -> ExportFile:
+def export_set(
+    store: LibraryStore,
+    song_set: SongSet,
+    fmt: Format,
+    *,
+    mode: Mode = "chords",
+    combine: bool = True,
+    print_layout: bool = False,
+) -> ExportFile:
     items = [ExportItem(i.song_id, i.key) for i in song_set.items if i.song_id]
     if fmt == "opensong":
         files = [(f"Sets/{safe_filename(song_set.name)}", set_to_xml(song_set).encode("utf-8"))]
@@ -127,7 +136,9 @@ def export_set(store: LibraryStore, song_set: SongSet, fmt: Format, *, mode: Mod
             song = store.get_song(item.song_id)
             files.append((f"Songs/{safe_filename(song.title)}", song_to_xml(song).encode("utf-8")))
         return _zip(files, safe_filename(song_set.name))
-    return export_songs(store, items, fmt, mode=mode, combine=combine, name=song_set.name, numbered=True)
+    return export_songs(
+        store, items, fmt, mode=mode, combine=combine, name=song_set.name, numbered=True, print_layout=print_layout
+    )
 
 
 def export_library(store: LibraryStore, fmt: Literal["opensong", "chordpro"], name: str = "Library") -> ExportFile:
@@ -224,7 +235,9 @@ def analyse(store: LibraryStore, candidates: list[ImportCandidate]) -> list[Impo
 Decision = Literal["skip", "overwrite", "new"]
 
 
-def apply_import(store: LibraryStore, candidates: list[ImportCandidate], decisions: dict[str, Decision]) -> dict[str, int]:
+def apply_import(
+    store: LibraryStore, candidates: list[ImportCandidate], decisions: dict[str, Decision]
+) -> dict[str, int]:
     """Save candidates; songs first so sets can resolve their song references."""
     counts = {"songs": 0, "sets": 0, "skipped": 0, "errors": 0}
     for c in sorted(candidates, key=lambda c: c.kind != "song"):
@@ -256,6 +269,14 @@ def apply_import(store: LibraryStore, candidates: list[ImportCandidate], decisio
 
 
 __all__ = [
-    "ExportFile", "ExportItem", "ImportCandidate", "NotFound", "analyse", "apply_import", "export_library",
-    "export_set", "export_songs", "read_upload",
+    "ExportFile",
+    "ExportItem",
+    "ImportCandidate",
+    "NotFound",
+    "analyse",
+    "apply_import",
+    "export_library",
+    "export_set",
+    "export_songs",
+    "read_upload",
 ]
