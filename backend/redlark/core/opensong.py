@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 import uuid as uuidlib
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from .chords import parse_key, transpose_chord
 from .model import Line, Section, Segment, SetItem, Song, SongSet
@@ -56,7 +56,7 @@ UUID_NAMESPACE = uuidlib.UUID("5b0c6f0e-6b8b-4f7c-9a57-8a1f4f0f9e11")
 
 
 def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 def stable_uuid(name: str) -> str:

@@ -120,7 +120,7 @@ def parse_chordpro(text: str, fallback_title: str = "") -> Song:
             if name in _META:
                 cur = getattr(song, _META[name])
                 if _META[name] == "author" and cur and arg not in cur:
-                    setattr(song, "author", f"{cur}, {arg}")
+                    song.author = f"{cur}, {arg}"
                 elif not cur:
                     setattr(song, _META[name], arg)
             elif name.startswith("start_of_"):
