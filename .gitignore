@@ -7,4 +7,11 @@ meh
 credentials.json
 certs
 test-certs
-dist
+dist__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+backend/redlark/static/
+build/pyinstaller/
+*.db

@@ -1,0 +1,27 @@
+{
+  "transpose": [
+    {"chord": "G", "change": 2, "expected": "A"},
+    {"chord": "A/C#", "change": -7, "expected": "D/F#"},
+    {"chord": "Bm", "change": 1, "expected": "Cm"},
+    {"chord": "Bm7", "change": 1, "expected": "Cm7"},
+    {"chord": "Asus", "change": 3, "expected": "Csus"},
+    {"chord": "Asus4", "change": 3, "expected": "Csus4"},
+    {"chord": "G/D", "change": 5, "expected": "C/G"},
+    {"chord": "Ab", "change": 0, "expected": "G#"},
+    {"chord": "Db", "change": 2, "expected": "Eb"},
+    {"chord": "F#m", "change": -1, "expected": "Fm"},
+    {"chord": "G#", "change": 1, "expected": "A"},
+    {"chord": "A", "change": -1, "expected": "G#"},
+    {"chord": "|", "change": 4, "expected": "|"},
+    {"chord": "(G)", "change": 2, "expected": "(A)"},
+    {"chord": "N.C.", "change": 3, "expected": "N.C."},
+    {"chord": "Ebmaj7", "change": 2, "expected": "Fmaj7"}
+  ],
+  "change": [
+    {"from": "D", "to": "G", "expected": 5},
+    {"from": "G", "to": "D", "expected": -5},
+    {"from": "Em", "to": "Am", "expected": -7},
+    {"from": "A#", "to": "Bb", "expected": 0},
+    {"from": "", "to": "G", "expected": 0}
+  ]
+}
