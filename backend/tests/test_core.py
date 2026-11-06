@@ -91,7 +91,7 @@ def test_chordpro_export_roundtrip(reasons_xml):
     song = parse_song_xml(reasons_xml)
     cho = song_to_chordpro(song)
     assert "{start_of_chorus: Chorus 1}" in cho
-    assert "Sing like [G]never be[Bm]fore" in cho
+    assert "Sing like [G]never be - [Bm]fore" in cho
     back = parse_chordpro(cho)
     a = [ln.lyric_text for s in lyrics_only(parse_lyrics(song.lyrics)) for ln in s.lines]
     b = [ln.lyric_text for s in lyrics_only(parse_lyrics(back.lyrics)) for ln in s.lines]

@@ -188,7 +188,7 @@ def _classify(name: str, content: bytes) -> ImportCandidate | None:
     text = _decode(content)
     stripped = text.lstrip()
     try:
-        if suffix in CHORDPRO_EXTS or (suffix == ".txt" and re.search(r"^\{\s*(t|title)\s*:", text, re.MULTILINE)):
+        if suffix in CHORDPRO_EXTS or (suffix == ".txt" and not stripped.startswith("<")):
             song = parse_chordpro(text, fallback_title=path.stem)
             return ImportCandidate(name, "song", "chordpro", song.title, song=song)
         if stripped.startswith("<"):

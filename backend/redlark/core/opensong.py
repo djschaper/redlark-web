@@ -28,6 +28,8 @@ SECTION_ABBREV_TO_TITLES = {
     "T": "Tag",
 }
 TITLE_TO_ABBREV = {v.lower(): k for k, v in SECTION_ABBREV_TO_TITLES.items()}
+# Spelling variants seen in ChordPro files ("Pre Chorus", "Prechorus", ...).
+TITLE_TO_ABBREV.update({"pre chorus": "P", "prechorus": "P", "pre-chorus": "P"})
 
 # Fields mapped onto Song attributes. Everything else is preserved in Song.extra.
 _FIELD_MAP = {
@@ -68,10 +70,15 @@ _DEFAULT_ORDER = [
     "key",
     "keyoriginal",
     "aka",
+    "key_line",
+    "books",
     "midi",
     "midi_index",
+    "pitch",
+    "restrictions",
     "notes",
     "lyrics",
+    "linked_songs",
     "pad_file",
     "custom_chords",
     "link_youtube",
@@ -227,6 +234,8 @@ def parse_lyrics(text: str) -> list[Section]:
             if i < len(lines) and _is_lyric_line(lines[i]):
                 lyric_line = lines[i][1:]
                 i += 1
+            # Every chord column has a lyric column under it, even past the end of the words.
+            lyric_line = lyric_line.ljust(len(chord_line))
             ensure().lines.append(Line(_split_chord_line(chord_line, lyric_line)))
         elif c == ";":
             ensure().lines.append(Line([Segment("", line[1:].strip())], kind="comment"))
@@ -267,10 +276,10 @@ def _line_to_text(line: Line) -> list[str]:
                 lyric += (" - " + " " * max(0, pad_n - 3)) if mid_word else " " * pad_n
             chords = chords.ljust(len(lyric)) + seg.chord
         lyric += seg.lyric
-    out = ["." + chords.rstrip()]
-    if lyric.strip():
-        out.append(" " + lyric)
-    return out
+    chords = chords.rstrip()
+    # OpenSong needs a lyric line under every chord line, at least as long as the chord line
+    # (all spaces for chord-only lines like ".| C . F/C | C |").
+    return ["." + chords, " " + lyric.ljust(len(chords))]
 
 
 def sections_to_lyrics(sections: list[Section]) -> str:
