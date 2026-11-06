@@ -31,12 +31,14 @@ import bars from '@fortawesome/fontawesome-free/svgs/solid/bars.svg?raw'
 import users from '@fortawesome/fontawesome-free/svgs/solid/users.svg?raw'
 import trash from '@fortawesome/fontawesome-free/svgs/solid/trash.svg?raw'
 import fileCode from '@fortawesome/fontawesome-free/svgs/solid/file-code.svg?raw'
+import expand from '@fortawesome/fontawesome-free/svgs/solid/expand.svg?raw'
+import compress from '@fortawesome/fontawesome-free/svgs/solid/compress.svg?raw'
 import { computed } from 'vue'
 
 const ICONS = {
   print, filePdf, fileExport, moonRegular, moonSolid, youtube, save, folderOpen, fileMedical, copy, arrowLeft,
   circle, circleMinus, circleUser, gear, logout, search, plus, pen, music, alignLeft, grip, download, upload,
-  list, xmark, rotate, bars, users, trash, fileCode,
+  list, xmark, rotate, bars, users, trash, fileCode, expand, compress,
 } as const
 
 export type IconName = keyof typeof ICONS

@@ -15,8 +15,9 @@ const props = withDefaults(
     youtubeUrl?: string
     canExport?: boolean
     canEdit?: boolean
+    fullscreen?: boolean
   }>(),
-  { info: '', youtubeUrl: '', canExport: true, canEdit: false },
+  { info: '', youtubeUrl: '', canExport: true, canEdit: false, fullscreen: false },
 )
 
 const emit = defineEmits<{
@@ -26,6 +27,7 @@ const emit = defineEmits<{
   print: []
   export: [format: ExportFormat]
   edit: []
+  fullscreen: []
 }>()
 
 const options = computed(() => keyOptions(props.originalKey || props.songKey))
@@ -78,7 +80,14 @@ function choose(format: ExportFormat) {
           </div>
         </span>
       </template>
-      <button v-if="canEdit" class="control-btn" title="Edit song" @click="emit('edit')"><Icon name="pen" /></button>
+      <button v-if="canEdit && !fullscreen" class="control-btn" title="Edit song" @click="emit('edit')"><Icon name="pen" /></button>
+      <button
+        class="control-btn"
+        :title="fullscreen ? 'Exit full screen (Esc)' : 'Full screen'"
+        @click="emit('fullscreen')"
+      >
+        <Icon :name="fullscreen ? 'compress' : 'expand'" />
+      </button>
     </div>
   </div>
 </template>

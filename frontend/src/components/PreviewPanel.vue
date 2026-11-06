@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, printHtml, saveBlob } from '../lib/api'
+import { useFullscreen } from '../lib/fullscreen'
 import type { ExportFormat } from '../lib/types'
 import { useAppStore } from '../stores/app'
 import { usePreviewStore } from '../stores/preview'
@@ -12,6 +13,8 @@ const app = useAppStore()
 const preview = usePreviewStore()
 const router = useRouter()
 const busy = ref(false)
+const windowEl = ref<HTMLElement | null>(null)
+const fs = useFullscreen(windowEl)
 
 const info = computed(() => {
   const s = preview.song
@@ -58,7 +61,7 @@ function edit() {
 <template>
   <div id="preview" class="panel">
     <h2>Preview <span v-if="busy || preview.loading" class="mini-loader"></span></h2>
-    <div id="preview-window" :class="{ dark: app.dark }">
+    <div id="preview-window" ref="windowEl" :class="{ dark: app.dark, 'is-fullscreen': fs.active.value }">
       <template v-if="preview.song">
         <SongToolbar
           :song-key="preview.key"
@@ -68,12 +71,14 @@ function edit() {
           :mode="app.view"
           :youtube-url="preview.song.youtube_url"
           :can-edit="app.canEdit"
+          :fullscreen="fs.active.value"
           @update:song-key="preview.changeKey"
           @update:dark="(d) => (app.dark = d)"
           @update:mode="(m) => (app.view = m)"
           @print="doPrint"
           @export="doExport"
           @edit="edit"
+          @fullscreen="fs.toggle"
         />
         <div class="sheet-scroll">
           <SongSheet :song="preview.song" :target-key="preview.key" :mode="app.view" />
@@ -110,6 +115,24 @@ function edit() {
 
 .sheet-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Full screen: the Fullscreen API, or the CSS fallback that covers the window. */
+#preview-window.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  border: none;
+  border-radius: 0;
+}
+
+#preview-window:fullscreen {
+  position: static;
+}
+
+#preview-window.is-fullscreen .song-sheet {
+  font-size: 1.2em;
+  padding: 12px 24px;
 }
 
 .preview-empty {
