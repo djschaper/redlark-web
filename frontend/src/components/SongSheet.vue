@@ -9,9 +9,12 @@ const props = withDefaults(
     song: SongPayload
     targetKey?: string
     mode?: ViewMode
-    columns?: boolean // flow sections into columns (screen); single column for print
+    columns?: boolean // flow sections into as many columns as fit
+    maxColumns?: number
+    /** Fixed content width in px (print/PDF), instead of measuring the on-screen container. */
+    fitWidth?: number
   }>(),
-  { targetKey: '', mode: 'chords', columns: true },
+  { targetKey: '', mode: 'chords', columns: true, maxColumns: 4, fitWidth: 0 },
 )
 
 const key = computed(() => props.targetKey || props.song.key)
@@ -30,7 +33,8 @@ async function measure() {
   const content = root.value.querySelector('.song-content') as HTMLElement | null
   if (content) {
     const widest = Math.max(1, ...[...content.querySelectorAll<HTMLElement>('.section')].map((el) => el.scrollWidth + (parseFloat(getComputedStyle(el).marginLeft) || 0)))
-    cols.value = Math.max(1, Math.min(4, Math.floor((content.clientWidth + GAP) / (widest + GAP))))
+    const width = props.fitWidth || content.clientWidth
+    cols.value = Math.max(1, Math.min(props.maxColumns, Math.floor((width + GAP) / (widest + GAP))))
   }
   measuring.value = false
 }
@@ -43,7 +47,7 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => observer?.disconnect())
-watch(() => [props.song, props.mode, props.targetKey, props.columns], measure)
+watch(() => [props.song, props.mode, props.targetKey, props.columns, props.maxColumns, props.fitWidth], measure)
 const change = computed(() => transpositionChange(props.song.key, key.value))
 
 const sections = computed<SongSection[]>(() =>

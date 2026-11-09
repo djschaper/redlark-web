@@ -18,6 +18,9 @@ function toggleFullscreen(i: number) {
   fsTarget.value = wrappers.value[i] ?? null
   fs.toggle()
 }
+// Letter (8.5in) minus 0.5in side margins, at 96 CSS px per inch (see backend render/pdf.py).
+const PRINT_WIDTH = 7.5 * 96
+
 props.data.songs.forEach((s, i) => (keys[i] = s.key))
 
 function printPage() {
@@ -55,7 +58,10 @@ onMounted(async () => {
         @print="printPage"
         @fullscreen="toggleFullscreen(i)"
       />
-      <SongSheet :song="song" :target-key="keys[i]" :mode="mode" :columns="!data.print" />
+      <SongSheet :song="song" :target-key="keys[i]" :mode="mode"
+        :max-columns="data.print ? 2 : 4"
+        :fit-width="data.print ? PRINT_WIDTH : 0"
+      />
     </div>
   </div>
 </template>

@@ -6,11 +6,14 @@ import { useFullscreen } from '../lib/fullscreen'
 import type { ExportFormat } from '../lib/types'
 import { useAppStore } from '../stores/app'
 import { usePreviewStore } from '../stores/preview'
+import { useSetStore } from '../stores/set'
+import Icon from './Icon.vue'
 import SongSheet from './SongSheet.vue'
 import SongToolbar from './SongToolbar.vue'
 
 const app = useAppStore()
 const preview = usePreviewStore()
+const set = useSetStore()
 const router = useRouter()
 const busy = ref(false)
 const windowEl = ref<HTMLElement | null>(null)
@@ -53,6 +56,19 @@ async function doPrint() {
   }
 }
 
+// Previewing a song from the set: step through the set without leaving the preview.
+const setIndex = computed(() =>
+  preview.setUid === null ? -1 : set.entries.findIndex((e) => e.uid === preview.setUid),
+)
+
+function goSet(delta: number) {
+  const e = set.entries[setIndex.value + delta]
+  if (!e) return
+  set.selectedUid = e.uid
+  preview.show(e.songId, { key: e.key, setUid: e.uid })
+  windowEl.value?.querySelector('.sheet-scroll')?.scrollTo(0, 0)
+}
+
 function edit() {
   if (preview.song) router.push({ name: 'edit-song', params: { id: preview.song.id } })
 }
@@ -63,6 +79,22 @@ function edit() {
     <h2>Preview <span v-if="busy || preview.loading" class="mini-loader"></span></h2>
     <div id="preview-window" ref="windowEl" :class="{ dark: app.dark, 'is-fullscreen': fs.active.value }">
       <template v-if="preview.song">
+        <nav v-if="setIndex >= 0" class="set-nav" aria-label="Songs in the set">
+          <button title="Previous song in set" :disabled="setIndex === 0" @click="goSet(-1)">
+            <Icon name="chevronLeft" />
+          </button>
+          <span class="set-nav-label">
+            <b>{{ setIndex + 1 }} / {{ set.entries.length }}</b>
+            <span class="set-nav-title">{{ set.entries[setIndex].title }}</span>
+          </span>
+          <button
+            title="Next song in set"
+            :disabled="setIndex === set.entries.length - 1"
+            @click="goSet(1)"
+          >
+            <Icon name="chevronRight" />
+          </button>
+        </nav>
         <SongToolbar
           :song-key="preview.key"
           :original-key="preview.song.key"
@@ -133,6 +165,44 @@ function edit() {
 #preview-window.is-fullscreen .song-sheet {
   font-size: 1.2em;
   padding: 12px 24px;
+}
+
+.set-nav {
+  display: flex;
+  align-items: center;
+  background: var(--accent-dark);
+  color: white;
+  min-height: 40px;
+}
+
+.set-nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 52px;
+  align-self: stretch;
+  cursor: pointer;
+}
+
+.set-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.set-nav-label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.set-nav-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preview-empty {

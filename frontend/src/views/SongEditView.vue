@@ -127,8 +127,13 @@ async function remove() {
 <style>
 .edit-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* minmax(0, …): inputs have a default intrinsic width that would otherwise stop the columns shrinking. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0 12px;
+}
+
+.edit-grid .field {
+  min-width: 0;
 }
 
 .edit-grid .wide {
@@ -147,7 +152,7 @@ async function remove() {
 
 @media (max-width: 700px) {
   .edit-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .lyrics-editor {
     min-height: 300px;

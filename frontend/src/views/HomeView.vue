@@ -104,17 +104,18 @@ const count = computed(() => set.entries.length)
     left: 0;
     right: 0;
     bottom: 0;
-    height: 56px;
+    height: var(--tab-bar-height);
+    box-sizing: border-box;
     background: var(--menu-bg);
     z-index: 40;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: var(--tab-bar-inset);
   }
   .tab-bar button {
     flex: 1;
     background: none;
     border: none;
     color: #9fb0c4;
-    font-size: 20px;
+    font-size: 17px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -124,7 +125,7 @@ const count = computed(() => set.entries.length)
     cursor: pointer;
   }
   .tab-bar button span {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
   }
   .tab-bar button.active {
@@ -133,7 +134,7 @@ const count = computed(() => set.entries.length)
   }
   .badge {
     position: absolute;
-    top: 6px;
+    top: 3px;
     left: calc(50% + 8px);
     background: var(--accent);
     color: white;

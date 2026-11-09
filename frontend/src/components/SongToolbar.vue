@@ -31,6 +31,7 @@ const emit = defineEmits<{
 }>()
 
 const options = computed(() => keyOptions(props.originalKey || props.songKey))
+const showKey = computed(() => props.mode === 'chords' && !!props.songKey)
 const menuOpen = ref(false)
 
 function choose(format: ExportFormat) {
@@ -41,18 +42,6 @@ function choose(format: ExportFormat) {
 
 <template>
   <div class="song-toolbar">
-    <div class="key-control" v-if="mode === 'chords' && songKey">
-      <label for="key-select">Key</label>
-      <select
-        id="key-select"
-        :value="songKey"
-        @change="emit('update:songKey', ($event.target as HTMLSelectElement).value)"
-      >
-        <option v-for="k in options" :key="k" :value="k">{{ k }}</option>
-      </select>
-    </div>
-    <div class="key-control" v-else></div>
-    <div class="info-text">{{ info }}</div>
     <div class="toolbar-buttons">
       <button
         class="control-btn"
@@ -89,6 +78,19 @@ function choose(format: ExportFormat) {
         <Icon :name="fullscreen ? 'compress' : 'expand'" />
       </button>
     </div>
+    <div v-if="showKey || info" class="toolbar-meta">
+      <div class="key-control" v-if="showKey">
+        <label for="key-select">Key</label>
+        <select
+          id="key-select"
+          :value="songKey"
+          @change="emit('update:songKey', ($event.target as HTMLSelectElement).value)"
+        >
+          <option v-for="k in options" :key="k" :value="k">{{ k }}</option>
+        </select>
+      </div>
+      <div class="info-text">{{ info }}</div>
+    </div>
   </div>
 </template>
 
@@ -97,14 +99,19 @@ function choose(format: ExportFormat) {
   color: white;
   background-color: #2589bd;
   padding: 5px 10px;
-  min-height: 30px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
   box-shadow: -5px 0 10px 10px rgba(0, 0, 0, 0.05);
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
-  flex-wrap: wrap;
+}
+
+/* Row 2: key on the left, last-set info on the right. */
+.toolbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
 }
 
 .key-control {
@@ -138,13 +145,15 @@ function choose(format: ExportFormat) {
   font-style: italic;
   font-size: small;
   flex: 1;
-  text-align: center;
+  min-width: 0;
+  text-align: right;
 }
 
 .toolbar-buttons {
   display: flex;
   align-items: center;
-  gap: 4px;
+  flex-wrap: wrap;
+  column-gap: 16px;
 }
 
 .control-btn {
@@ -152,11 +161,18 @@ function choose(format: ExportFormat) {
   border: none;
   color: white;
   font-size: 18px;
-  padding: 4px 6px;
+  /* No side padding: the icon's edges are the button's edges, so the row lines up with the key
+     control below. Spacing comes from the row's gap. */
+  padding: 4px 0;
   cursor: pointer;
   transition-duration: 0.2s;
   display: inline-flex;
   text-decoration: none;
+}
+
+.control-btn .icon,
+.control-btn .icon svg {
+  width: auto; /* the glyph's own width, not a padded 1em square */
 }
 
 .control-btn:hover {
@@ -203,14 +219,12 @@ function choose(format: ExportFormat) {
 }
 
 @media (max-width: 600px) {
-  .info-text {
-    order: 3;
-    flex-basis: 100%;
-    text-align: left;
+  .toolbar-buttons {
+    column-gap: 18px;
   }
   .control-btn {
     font-size: 20px;
-    padding: 6px 7px;
+    padding: 6px 0;
   }
 }
 
