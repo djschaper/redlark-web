@@ -143,13 +143,12 @@ async function newFromOnline(remote: LibraryInfo) {
   }
 }
 
-function openInBrowserMode() {
-  if (settings.value?.online_url) window.location.href = settings.value.online_url
-}
-
-async function setConnection(mode: 'offline' | 'online') {
-  settings.value = await api.updateSettings({ connection: mode })
-  app.notify(mode === 'online' ? 'Redlark will open your online account next time it starts' : 'Redlark will start offline')
+async function openWebsite() {
+  const url = settings.value?.online_url
+  if (!url) return
+  const d = await desktop()
+  if (d) await d.open_external(url)
+  else window.open(url, '_blank', 'noopener')
 }
 </script>
 
@@ -218,7 +217,11 @@ async function setConnection(mode: 'offline' | 'online') {
           </div>
         </div>
 
-        <h2 style="margin-top: 24px">Online account</h2>
+        <h2 style="margin-top: 24px">Sync with an online account</h2>
+        <p class="muted">
+          <small>Link a library on this computer to one of your online libraries to sync songs and sets both
+          ways. Redlark itself always runs from this computer.</small>
+        </p>
         <div class="field">
           <div class="row">
             <input v-model="onlineUrl" class="text-input path" placeholder="https://redlark.example.org" />
@@ -228,7 +231,8 @@ async function setConnection(mode: 'offline' | 'online') {
           </div>
           <small v-if="settings.remote_token" class="muted">
             Connected to {{ settings.online_url }} ·
-            <a href="#" @click.prevent="loadRemote">show online libraries</a>
+            <a href="#" @click.prevent="loadRemote">show online libraries</a> ·
+            <a href="#" @click.prevent="openWebsite">open website in browser</a>
           </small>
         </div>
         <div v-if="remoteLibs.length" class="field">
@@ -238,15 +242,6 @@ async function setConnection(mode: 'offline' | 'online') {
             <button class="btn secondary" @click="newFromOnline(r)">Download for offline use</button>
           </div>
         </div>
-        <div class="field" v-if="settings.online_url">
-          <span class="label">When the app starts</span>
-          <div class="row">
-            <label><input type="radio" :checked="settings.connection === 'offline'" @change="setConnection('offline')" /> Use offline libraries</label>
-            <label><input type="radio" :checked="settings.connection === 'online'" @change="setConnection('online')" /> Open my online account</label>
-            <button class="btn secondary" @click="openInBrowserMode">Go online now</button>
-          </div>
-        </div>
-
         <div v-if="plan" class="sync-plan">
           <h2>Sync preview</h2>
           <p>

@@ -301,7 +301,6 @@ def remove_member(
 
 
 class SettingsPatch(BaseModel):
-    connection: Literal["offline", "online"] | None = None
     online_url: str | None = None
     display_mode: Literal["light", "dark"] | None = None
     default_view: Literal["chords", "lyrics"] | None = None

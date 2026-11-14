@@ -1,4 +1,4 @@
-"""Desktop/offline settings: which libraries exist locally, connection mode, display defaults."""
+"""Desktop settings: which libraries exist locally, the online account used for sync, display defaults."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ class LocalLibrary(BaseModel):
 
 
 class LocalSettings(BaseModel):
-    connection: Literal["offline", "online"] = "offline"
+    # Online Redlark that local libraries sync with (the app itself always runs locally).
     online_url: str = ""
     display_mode: Literal["light", "dark"] = "light"
     default_view: Literal["chords", "lyrics"] = "chords"

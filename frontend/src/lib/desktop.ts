@@ -4,8 +4,6 @@ interface DesktopApi {
   pick_folder(): Promise<string>
   open_external(url: string): Promise<void>
   update_info(): Promise<{ version: string; url: string } | null>
-  go_offline(): Promise<void>
-  go_online(): Promise<void>
 }
 
 declare global {

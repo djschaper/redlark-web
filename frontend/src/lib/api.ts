@@ -185,7 +185,6 @@ export interface LocalLibrary {
 }
 
 export interface LocalSettings {
-  connection: 'offline' | 'online'
   online_url: string
   display_mode: 'light' | 'dark'
   default_view: ViewMode

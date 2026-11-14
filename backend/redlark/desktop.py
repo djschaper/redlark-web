@@ -1,7 +1,8 @@
-"""Desktop app: runs the local (offline) server and opens it in a native window via pywebview.
+"""Desktop app: runs the local server and opens it in a native window via pywebview.
 
-When the local settings say ``connection = "online"`` the window opens the hosted Redlark instead,
-so the desktop app behaves exactly like the website. The app menu switches between the two.
+The window always shows the UI bundled with this build, so it never changes under the user when
+the hosted website is updated. An online account is used only to sync local libraries
+(see ``api/sync.py``).
 """
 
 from __future__ import annotations
@@ -71,7 +72,6 @@ class DesktopApi:
 
     def __init__(self) -> None:
         self._window = None
-        self._local_url = ""
 
     def pick_folder(self) -> str:
         import webview
@@ -88,47 +88,22 @@ class DesktopApi:
     def update_info(self) -> dict | None:
         return check_for_update()
 
-    def go_offline(self) -> None:
-        self._set_connection("offline")
-        if self._window:
-            self._window.load_url(self._local_url)
-
-    def go_online(self) -> None:
-        url = self._set_connection("online")
-        if self._window and url:
-            self._window.load_url(url)
-
-    def _set_connection(self, mode: str) -> str:
-        from .config import get_settings
-        from .local_settings import LocalSettingsStore
-
-        store = LocalSettingsStore(get_settings().data_dir)
-        s = store.load()
-        s.connection = mode  # type: ignore[assignment]
-        store.save(s)
-        return s.online_url
-
 
 def run(port: int = 0) -> None:
     import webview
     from webview.menu import Menu, MenuAction
 
     from .config import get_settings
-    from .local_settings import LocalSettingsStore
 
     os.environ.setdefault("REDLARK_PDF_BROWSER_CHANNEL", "")
     port = port or _free_port()
     _start_server(port)
     local_url = f"http://127.0.0.1:{port}/"
 
-    settings = LocalSettingsStore(get_settings().data_dir).load()
-    start_url = settings.online_url if settings.connection == "online" and settings.online_url else local_url
-
     api = DesktopApi()
-    api._local_url = local_url
     window = webview.create_window(
         f"Redlark {__version__}",
-        start_url,
+        local_url,
         js_api=api,
         width=1400,
         height=850,
@@ -140,11 +115,7 @@ def run(port: int = 0) -> None:
     menu = [
         Menu(
             "Redlark",
-            [
-                MenuAction("Use offline libraries", api.go_offline),
-                MenuAction("Use online account", api.go_online),
-                MenuAction("Settings", lambda: window.load_url(local_url + "settings")),
-            ],
+            [MenuAction("Settings", lambda: window.load_url(local_url + "settings"))],
         )
     ]
     webview.settings["ALLOW_DOWNLOADS"] = True

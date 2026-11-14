@@ -3,18 +3,18 @@
 Plan worship sets from an OpenSong song library: browse and search songs, preview them in any
 key, with chords or lyrics only, build sets, and print/export them.
 
-Version 2 runs three ways from one codebase:
+Version 2 runs two ways from one codebase:
 
 | | Where data lives | Accounts |
 |---|---|---|
 | **Website** (hosted) | Postgres, shared team libraries | Email + password; roles *viewer / editor / owner* |
-| **Desktop, offline** | An OpenSong folder (`Songs/`, `Sets/`, read and written in place, so OpenSong itself keeps working) or a local library file | None |
-| **Desktop, online** | Opens the website in the app window | Your website account |
+| **Desktop** | An OpenSong folder (`Songs/`, `Sets/`, read and written in place, so OpenSong itself keeps working) or a local library file | None (optionally a website account, for sync) |
 
-An offline desktop library can be linked to an online library and **synced** both ways
-(Settings → Sync). Songs match by their OpenSong `uuid`, sets by name; anything changed on both
-sides since the last sync is listed so you can choose which version to keep. Deletions are not
-synced.
+The desktop app always runs its own bundled UI, so it never changes when the website is updated.
+To share with a team, connect it to your website account and link a desktop library to an online
+library; the two then **sync** both ways (Settings → Sync with an online account). Songs match
+by their OpenSong `uuid`, sets by name; anything changed on both sides since the last sync is
+listed so you can choose which version to keep. Deletions are not synced.
 
 ## Features
 

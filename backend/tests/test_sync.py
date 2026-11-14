@@ -64,3 +64,17 @@ def test_push_then_pull_and_conflict(tmp_path, fixtures):
     conflict = next(e for e in plan.entries if e.action == "conflict")
     apply_sync(local, remote, plan, {conflict.key: "local"})
     assert client.get(f"/api/libraries/{lib}/songs/{sid}").json()["tempo"] == "100"
+
+
+def test_old_settings_with_connection_mode_still_load(tmp_path, monkeypatch):
+    from redlark.local_settings import LocalSettingsStore
+
+    monkeypatch.setenv("REDLARK_SKIP_V1_IMPORT", "1")
+    (tmp_path / "settings.json").write_text(
+        '{"connection": "online", "online_url": "https://r.example.org", "display_mode": "dark"}'
+    )
+    store = LocalSettingsStore(tmp_path)
+    s = store.load()
+    assert s.online_url == "https://r.example.org" and s.display_mode == "dark"
+    store.save(s)
+    assert "connection" not in (tmp_path / "settings.json").read_text()
