@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Songs | Set + Team | Preview. Below 900px the panels become tabs with a bottom bar.
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Icon from '../components/Icon.vue'
 import PreviewPanel from '../components/PreviewPanel.vue'
@@ -19,11 +19,26 @@ const router = useRouter()
 const narrow = ref(false)
 const mq = window.matchMedia('(max-width: 900px)')
 const update = () => (narrow.value = mq.matches)
+// Ctrl/Cmd+K jumps to the song search (switching to the Songs tab on narrow screens).
+async function onSearchShortcut(e: KeyboardEvent) {
+  if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'k') return
+  e.preventDefault()
+  tab.value = 'songs'
+  await nextTick()
+  const box = document.getElementById('song-searchbox') as HTMLInputElement | null
+  box?.focus()
+  box?.select()
+}
+
 onMounted(() => {
   update()
   mq.addEventListener('change', update)
+  document.addEventListener('keydown', onSearchShortcut)
 })
-onUnmounted(() => mq.removeEventListener('change', update))
+onUnmounted(() => {
+  mq.removeEventListener('change', update)
+  document.removeEventListener('keydown', onSearchShortcut)
+})
 
 const showPreview = () => {
   if (narrow.value) tab.value = 'preview'

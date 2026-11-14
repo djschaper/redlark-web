@@ -33,6 +33,15 @@ function addToSet(song: SongSummary) {
   app.notify(`Added "${song.title}" to the set`)
 }
 
+// Enter in the search box adds the top match, then clears the search for the next one.
+function addTopResult(e: KeyboardEvent) {
+  if (e.isComposing || !search.value.trim()) return
+  const top = filtered.value[0]
+  if (!top) return
+  addToSet(top)
+  search.value = ''
+}
+
 // Dragging a song into the Set panel clones it into a set entry.
 let uid = 1_000_000
 function toEntry(song: SongSummary): SetEntry {
@@ -49,7 +58,9 @@ function toEntry(song: SongSummary): SetEntry {
       </button>
     </h2>
     <div id="song-searchbox-container">
-      <input id="song-searchbox" v-model="search" type="search" placeholder="" aria-label="Search songs" />
+      <input id="song-searchbox" v-model="search" type="search" placeholder="" aria-label="Search songs"
+        @keydown.enter.prevent="addTopResult"
+      />
       <Icon name="search" />
     </div>
     <div v-if="app.songsLoading && !app.songs.length" class="object-list"><div class="loader"></div></div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import draggable from 'vuedraggable'
 import { api, printHtml, saveBlob } from '../lib/api'
 import { ALL_KEYS, isValidKey, keyOptions } from '../lib/chords'
@@ -52,6 +52,22 @@ async function loadSet(s: SetSummary) {
     app.fail(e)
   }
 }
+
+// Ctrl/Cmd+S saves the set (same rules as the save button); with no name yet, jump to the name box.
+const nameInput = ref<HTMLInputElement | null>(null)
+function onSaveShortcut(e: KeyboardEvent) {
+  if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 's') return
+  e.preventDefault()
+  if (!app.canEdit || set.saving) return
+  if (set.dirty && set.entries.length && !set.name.trim()) {
+    nameInput.value?.focus()
+    app.notify('Name the set to save it')
+    return
+  }
+  if (set.canSave) set.save()
+}
+onMounted(() => document.addEventListener('keydown', onSaveShortcut))
+onBeforeUnmount(() => document.removeEventListener('keydown', onSaveShortcut))
 
 function newSet() {
   if (set.dirty && set.entries.length && !confirm('Discard unsaved changes to the current set?')) return
@@ -166,7 +182,7 @@ function onChange() {
     <div class="slider" :class="{ opening }">
       <div class="slide" id="edit-set-view">
         <div class="toolbar" id="edit-set-tools">
-          <input id="set-name" v-model="set.name" type="text" placeholder="Unsaved Set" @input="set.dirty = true" />
+          <input id="set-name" ref="nameInput" v-model="set.name" type="text" placeholder="Unsaved Set" @input="set.dirty = true" />
           <button
             class="dark-button"
             title="Save set"
