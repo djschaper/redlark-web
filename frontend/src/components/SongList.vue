@@ -68,6 +68,7 @@ function toEntry(song: SongSummary): SetEntry {
       <input id="song-searchbox" v-model="search" type="search" placeholder="" aria-label="Search songs"
         @keydown.enter.exact.prevent="addTopResult"
         @keydown.shift.enter.exact.prevent="previewTopResult"
+        @keydown.esc.exact.prevent="search = ''"
       />
       <Icon name="search" />
     </div>

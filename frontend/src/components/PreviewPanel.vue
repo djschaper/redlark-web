@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, printHtml, saveBlob } from '../lib/api'
+import { parseKey, transposeChord } from '../lib/chords'
 import { useFullscreen } from '../lib/fullscreen'
 import type { ExportFormat } from '../lib/types'
 import { useAppStore } from '../stores/app'
@@ -92,13 +93,28 @@ function usesArrowKeys(el: Element | null): boolean {
   return false
 }
 
+// Up/down arrows transpose the previewed song a semitone (chords view only, like the key picker).
+function transpose(delta: number) {
+  const key = parseKey(preview.key)
+  if (!key) return
+  preview.changeKey(transposeChord(key, delta))
+}
+
 function onKey(e: KeyboardEvent) {
-  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+  const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: 1, ArrowDown: -1 }[e.key]
+  if (!step) return
   if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
-  if (setIndex.value < 0 || !windowEl.value?.getClientRects().length) return // not in a set / panel hidden
+  if (!preview.song || !windowEl.value?.getClientRects().length) return // nothing shown / panel hidden
   if (usesArrowKeys(document.activeElement)) return
-  e.preventDefault()
-  goSet(e.key === 'ArrowLeft' ? -1 : 1)
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    if (setIndex.value < 0) return // not previewing from the set
+    e.preventDefault()
+    goSet(step)
+  } else {
+    if (app.view !== 'chords' || !parseKey(preview.key)) return
+    e.preventDefault()
+    transpose(step)
+  }
 }
 
 onMounted(() => document.addEventListener('keydown', onKey))
