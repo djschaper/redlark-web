@@ -80,7 +80,6 @@ const count = computed(() => set.entries.length)
   display: flex;
   flex-direction: column;
   margin-top: 5px;
-  gap: 10px;
 }
 
 #set-team #set {

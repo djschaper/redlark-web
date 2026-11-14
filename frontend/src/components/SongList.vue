@@ -123,6 +123,7 @@ function toEntry(song: SongSummary): SetEntry {
   min-width: 0;
   height: 100%;
   color: var(--text);
+  outline: none;
 }
 
 #song-searchbox-container .icon {
