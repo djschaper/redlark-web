@@ -9,6 +9,7 @@ from __future__ import annotations
 import copy
 import os
 import re
+import stat
 import threading
 from datetime import UTC
 from pathlib import Path
@@ -29,10 +30,10 @@ def safe_filename(name: str) -> str:
     return name or "Untitled"
 
 
-def _mtime_iso(p: Path) -> str:
+def _mtime_iso(p: Path, st: os.stat_result | None = None) -> str:
     from datetime import datetime
 
-    ts = datetime.fromtimestamp(p.stat().st_mtime, UTC)
+    ts = datetime.fromtimestamp((st or p.stat()).st_mtime, UTC)
     return ts.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
@@ -48,6 +49,13 @@ def _set_mtime(p: Path, iso: str) -> None:
 
 def _is_entry(p: Path) -> bool:
     return p.is_file() and "." not in p.name
+
+
+def _entries(folder: Path) -> list[os.DirEntry]:
+    """Song/set files in ``folder``. ``os.scandir`` gets the file type (and, on Windows, the stat)
+    with the listing, so this avoids a per-file stat call, which is slow on synced drives."""
+    with os.scandir(folder) as it:
+        return [e for e in it if "." not in e.name and e.is_file()]
 
 
 class FolderStore:
@@ -67,8 +75,8 @@ class FolderStore:
         return self.root / SETS_SUB_FOLDER
 
     # ------------------------------------------------------------ helpers
-    def _cached(self, path: Path, loader):
-        st = path.stat()
+    def _cached(self, path: Path, loader, st: os.stat_result | None = None):
+        st = st or path.stat()
         sig = (st.st_mtime, st.st_size)
         with self._lock:
             hit = self._cache.get(path)
@@ -91,14 +99,14 @@ class FolderStore:
             raise NotFound(set_id)
         return p
 
-    def _load_song(self, path: Path) -> Song:
+    def _load_song(self, path: Path, st: os.stat_result | None = None) -> Song:
         def load(p: Path) -> Song:
             song = parse_song_xml(p.read_bytes(), p.name)
             if not song.last_modified:
                 song.last_modified = _mtime_iso(p)
             return song
 
-        return self._cached(path, load)
+        return self._cached(path, load, st)
 
     def _check_writable(self) -> None:
         if self.read_only:
@@ -109,11 +117,10 @@ class FolderStore:
         if not self.songs_dir.is_dir():
             return []
         out = []
-        for p in self.songs_dir.iterdir():
-            if not _is_entry(p):
-                continue
+        for e in _entries(self.songs_dir):
+            p = Path(e.path)
             try:
-                s = self._load_song(p)
+                s = self._load_song(p, e.stat())
                 out.append(SongSummary(p.name, p.name, s.author, s.key, s.uuid, s.last_modified))
             except Exception:  # unreadable file: still list it by name
                 out.append(SongSummary(p.name, p.name))
@@ -165,15 +172,21 @@ class FolderStore:
     def list_sets(self) -> list[SetSummary]:
         if not self.sets_dir.is_dir():
             return []
-        out = [SetSummary(p.name, p.name, _mtime_iso(p)) for p in self.sets_dir.iterdir() if _is_entry(p)]
+        out = [SetSummary(e.name, e.name, _mtime_iso(Path(e.path), e.stat())) for e in _entries(self.sets_dir)]
         out.sort(key=lambda s: s.name, reverse=True)
         return out
 
     def get_set(self, set_id: str) -> SongSet:
-        path = self._set_path(set_id)
-        song_set: SongSet = copy.deepcopy(self._cached(path, lambda p: parse_set_xml(p.read_bytes(), p.name)))
-        song_set.last_modified = _mtime_iso(path)
-        names = {s.id for s in self.list_songs()}
+        path = self.sets_dir / set_id
+        try:
+            st = path.stat()
+        except OSError:
+            raise NotFound(set_id) from None
+        if path.parent != self.sets_dir or "." in path.name or not stat.S_ISREG(st.st_mode):
+            raise NotFound(set_id)
+        song_set: SongSet = copy.deepcopy(self._cached(path, lambda p: parse_set_xml(p.read_bytes(), p.name), st))
+        song_set.last_modified = _mtime_iso(path, st)
+        names = {e.name for e in _entries(self.songs_dir)} if self.songs_dir.is_dir() else set()
         for item in song_set.items:
             item.song_id = item.name if item.name in names else ""
         return song_set
