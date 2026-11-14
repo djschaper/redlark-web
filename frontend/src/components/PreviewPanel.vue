@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, printHtml, saveBlob } from '../lib/api'
 import { useFullscreen } from '../lib/fullscreen'
@@ -68,6 +68,37 @@ function goSet(delta: number) {
   preview.show(e.songId, { key: e.key, setUid: e.uid })
   windowEl.value?.querySelector('.sheet-scroll')?.scrollTo(0, 0)
 }
+
+// Left/right arrows step through the set, unless focus is somewhere that uses the arrow keys itself.
+const ARROW_ROLES = new Set([
+  'textbox', 'searchbox', 'combobox', 'listbox', 'slider', 'spinbutton', 'menu', 'menubar',
+  'radiogroup', 'radio', 'tablist', 'tab', 'tree', 'treegrid', 'grid',
+])
+
+function usesArrowKeys(el: Element | null): boolean {
+  for (let node = el; node && node !== document.body; node = node.parentElement) {
+    if (node instanceof HTMLInputElement) {
+      return !['button', 'submit', 'reset', 'checkbox', 'file', 'image', 'color'].includes(node.type)
+    }
+    if (node instanceof HTMLTextAreaElement || node instanceof HTMLSelectElement) return true
+    if (node instanceof HTMLElement && node.isContentEditable) return true
+    const role = node.getAttribute('role')
+    if (role && ARROW_ROLES.has(role)) return true
+  }
+  return false
+}
+
+function onKey(e: KeyboardEvent) {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+  if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
+  if (setIndex.value < 0 || !windowEl.value?.getClientRects().length) return // not in a set / panel hidden
+  if (usesArrowKeys(document.activeElement)) return
+  e.preventDefault()
+  goSet(e.key === 'ArrowLeft' ? -1 : 1)
+}
+
+onMounted(() => document.addEventListener('keydown', onKey))
+onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 
 function edit() {
   if (preview.song) router.push({ name: 'edit-song', params: { id: preview.song.id } })
