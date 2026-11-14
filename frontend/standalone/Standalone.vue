@@ -13,7 +13,11 @@ const mode = ref<ViewMode>(props.data.mode)
 const keys = reactive<Record<number, string>>({})
 const wrappers = ref<HTMLElement[]>([])
 const fsTarget = ref<HTMLElement | null>(null)
-const fs = useFullscreen(fsTarget)
+// Ctrl+F shows the song at the top of the view full screen.
+const fs = useFullscreen(fsTarget, {
+  shortcutTarget: () =>
+    props.data.print ? null : (wrappers.value.find((w) => w.getBoundingClientRect().bottom > 80) ?? null),
+})
 function toggleFullscreen(i: number) {
   fsTarget.value = wrappers.value[i] ?? null
   fs.toggle()

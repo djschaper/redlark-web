@@ -72,7 +72,7 @@ function choose(format: ExportFormat) {
       <button v-if="canEdit && !fullscreen" class="control-btn" title="Edit song" @click="emit('edit')"><Icon name="pen" /></button>
       <button
         class="control-btn"
-        :title="fullscreen ? 'Exit full screen (Esc)' : 'Full screen'"
+        :title="fullscreen ? 'Exit full screen (Esc or Ctrl+F)' : 'Full screen (Ctrl+F)'"
         @click="emit('fullscreen')"
       >
         <Icon :name="fullscreen ? 'compress' : 'expand'" />

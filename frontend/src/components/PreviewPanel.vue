@@ -17,7 +17,11 @@ const set = useSetStore()
 const router = useRouter()
 const busy = ref(false)
 const windowEl = ref<HTMLElement | null>(null)
-const fs = useFullscreen(windowEl)
+// Ctrl+F goes full screen only when a song is showing and the panel is visible (not a hidden tab).
+const fs = useFullscreen(windowEl, {
+  shortcutTarget: () =>
+    preview.song && windowEl.value?.getClientRects().length ? windowEl.value : null,
+})
 
 const info = computed(() => {
   const s = preview.song
