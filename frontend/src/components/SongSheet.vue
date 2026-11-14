@@ -106,7 +106,7 @@ function hasChords(line: { segments: Segment[] }): boolean {
         v-for="(section, si) in sections"
         :key="si"
         class="section"
-        :class="{ indented: section.indented && mode === 'chords' }"
+        :class="{ indented: section.indented }"
       >
         <div class="section-title" v-if="section.label">{{ section.label }}</div>
         <template v-for="(line, li) in section.lines" :key="li">
