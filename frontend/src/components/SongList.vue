@@ -42,6 +42,13 @@ function addTopResult(e: KeyboardEvent) {
   search.value = ''
 }
 
+// Shift+Enter previews the top match without adding it; the search stays so Enter can still add it.
+function previewTopResult(e: KeyboardEvent) {
+  if (e.isComposing || !search.value.trim()) return
+  const top = filtered.value[0]
+  if (top) open(top)
+}
+
 // Dragging a song into the Set panel clones it into a set entry.
 let uid = 1_000_000
 function toEntry(song: SongSummary): SetEntry {
@@ -59,7 +66,8 @@ function toEntry(song: SongSummary): SetEntry {
     </h2>
     <div id="song-searchbox-container">
       <input id="song-searchbox" v-model="search" type="search" placeholder="" aria-label="Search songs"
-        @keydown.enter.prevent="addTopResult"
+        @keydown.enter.exact.prevent="addTopResult"
+        @keydown.shift.enter.exact.prevent="previewTopResult"
       />
       <Icon name="search" />
     </div>
