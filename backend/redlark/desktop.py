@@ -10,9 +10,11 @@ from __future__ import annotations
 import json
 import os
 import socket
+import sys
 import threading
 import time
 import urllib.request
+from pathlib import Path
 
 from . import __version__
 
@@ -120,7 +122,32 @@ def run(port: int = 0) -> None:
     ]
     webview.settings["ALLOW_DOWNLOADS"] = True
     webview.settings["OPEN_EXTERNAL_LINKS_IN_BROWSER"] = True
-    webview.start(menu=menu, private_mode=False, storage_path=str(get_settings().data_dir / "webview"))
+    _use_own_taskbar_identity()
+    webview.start(
+        menu=menu,
+        private_mode=False,
+        storage_path=str(get_settings().data_dir / "webview"),
+        # Window + taskbar icon. pywebview's docs say GTK/QT only, but WinForms honours it too;
+        # without it the window takes the icon of the running executable (python.exe from source).
+        icon=str(ICON_PATH),
+    )
+
+
+ICON_PATH = Path(__file__).parent / "static" / "favicon.ico"
+
+
+def _use_own_taskbar_identity() -> None:
+    """Running from source, give the process its own taskbar identity so Windows doesn't group the
+    window under python.exe (and its icon). The packaged Redlark.exe already has one; setting an ID
+    there would no longer match the installer's shortcut, so pinned and running icons would split."""
+    if sys.platform != "win32" or getattr(sys, "frozen", False):
+        return
+    try:
+        import ctypes
+
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Redlark.Desktop.Dev")
+    except (AttributeError, OSError):
+        pass
 
 
 if __name__ == "__main__":
