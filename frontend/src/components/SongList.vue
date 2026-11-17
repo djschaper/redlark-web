@@ -42,6 +42,12 @@ function addTopResult(e: KeyboardEvent) {
   search.value = ''
 }
 
+// The clear (×) button: our own, since only Chromium browsers draw one for search inputs.
+function clearSearch() {
+  search.value = ''
+  document.getElementById('song-searchbox')?.focus()
+}
+
 // Shift+Enter previews the top match without adding it; the search stays so Enter can still add it.
 function previewTopResult(e: KeyboardEvent) {
   if (e.isComposing || !search.value.trim()) return
@@ -70,6 +76,9 @@ function toEntry(song: SongSummary): SetEntry {
         @keydown.shift.enter.exact.prevent="previewTopResult"
         @keydown.esc.exact.prevent="search = ''"
       />
+      <button v-if="search" class="search-clear" title="Clear search" aria-label="Clear search" @click="clearSearch">
+        <Icon name="xmark" />
+      </button>
       <Icon name="search" />
     </div>
     <div v-if="app.songsLoading && !app.songs.length" class="object-list"><div class="loader"></div></div>
@@ -138,6 +147,36 @@ function toEntry(song: SongSummary): SetEntry {
 #song-searchbox-container .icon {
   padding: 5px 10px;
   opacity: 0.5;
+}
+
+/* Hide the browser's own clear button (Chromium only); .search-clear replaces it everywhere. */
+#song-searchbox::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+/* Same grey as the search icon: text colour at half opacity. */
+.search-clear {
+  background: none;
+  border: none;
+  padding: 5px 0 5px 6px;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: inherit;
+}
+
+.search-clear:hover {
+  opacity: 0.8;
+}
+
+/* The button carries the opacity; don't apply the search icon's padding/opacity a second time. */
+#song-searchbox-container .search-clear .icon {
+  padding: 0;
+  opacity: 1;
 }
 
 .empty-hint {
