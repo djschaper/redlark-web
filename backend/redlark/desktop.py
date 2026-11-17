@@ -93,7 +93,6 @@ class DesktopApi:
 
 def run(port: int = 0) -> None:
     import webview
-    from webview.menu import Menu, MenuAction
 
     from .config import get_settings
 
@@ -114,17 +113,11 @@ def run(port: int = 0) -> None:
     )
     api._window = window
 
-    menu = [
-        Menu(
-            "Redlark",
-            [MenuAction("Settings", lambda: window.load_url(local_url + "settings"))],
-        )
-    ]
+    # No native menu bar: Settings is in the app's own profile menu.
     webview.settings["ALLOW_DOWNLOADS"] = True
     webview.settings["OPEN_EXTERNAL_LINKS_IN_BROWSER"] = True
     _use_own_taskbar_identity()
     webview.start(
-        menu=menu,
         private_mode=False,
         storage_path=str(get_settings().data_dir / "webview"),
         # Window + taskbar icon. pywebview's docs say GTK/QT only, but WinForms honours it too;
