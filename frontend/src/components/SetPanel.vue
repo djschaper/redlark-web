@@ -311,6 +311,12 @@ function onChange() {
   padding: 4px 2px;
 }
 
+/* No focus ring, like the song search (beats the global :focus-visible rule regardless of order). */
+#set-name:focus-visible,
+.set-filter:focus-visible {
+  outline: none;
+}
+
 #set-song-list {
   padding-bottom: 30px;
 }
