@@ -136,11 +136,6 @@ function choose(format: ExportFormat) {
   box-shadow: 0 0 3px 4px rgba(0, 0, 0, 0.2);
 }
 
-#key-select option {
-  color: black;
-  background: white;
-}
-
 .info-text {
   font-style: italic;
   font-size: small;
